@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { Grid, Box, Typography, Stack } from "@mui/material";
-import PageContainer from "../../../../src/components/container/PageContainer";
-import Logo from "../../../../src/layouts/full/shared/logo/Logo";
+import PageContainer from "../../../src/components/container/PageContainer";
+import Logo from "../../../src/layouts/full/shared/logo/Logo";
 
-import AuthRegister from "../../authForms/AuthRegister";
+import AuthRegister from "../authForms/AuthRegister";
 
 const Register = () => (
   <PageContainer>

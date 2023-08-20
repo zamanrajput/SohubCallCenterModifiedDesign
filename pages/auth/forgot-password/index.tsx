@@ -1,7 +1,7 @@
 import { Grid, Box, Typography } from '@mui/material';
-import Logo from '../../../../src/layouts/full/shared/logo/Logo';
-import PageContainer from '../../../../src/components/container/PageContainer';
-import AuthForgotPassword from '../../authForms/AuthForgotPassword';
+import Logo from '../../../src/layouts/full/shared/logo/Logo';
+import PageContainer from '../../../src/components/container/PageContainer';
+import AuthForgotPassword from '../authForms/AuthForgotPassword';
 
 const ForgotPassword = () => (
   <PageContainer>

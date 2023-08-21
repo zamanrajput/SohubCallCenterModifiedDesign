@@ -28,6 +28,8 @@ import "../src/components/landingpage/testimonial/testimonial.css";
 import "../src/components/landingpage/demo-slider/demo-slider.css";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import "../src/components/pages/home/DialPad/DialPad.css";
+import "../src/globals.css";
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();

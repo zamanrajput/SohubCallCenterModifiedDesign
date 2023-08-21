@@ -64,17 +64,24 @@ import {
   IconBorderStyle2,
   IconAppWindow
 } from '@tabler/icons-react';
-import { History } from '@mui/icons-material';
+import { Apps, History } from '@mui/icons-material';
 
 const Menuitems: MenuitemsType[] = [
 
   {
     id: uniqueId(),
-    title: 'Home',
+    title: 'Dashboard',
     icon: IconAperture,
     href: '/',
     chip: 'New',
     chipColor: 'secondary',
+  },
+  {
+    id: uniqueId(),
+    title: 'Home',
+    icon: Apps,
+    href: '/home',
+
   },
   {
     id: uniqueId(),
@@ -466,12 +473,12 @@ const Menuitems: MenuitemsType[] = [
   //       icon: IconPoint,
   //       href: '/ui-components/chip',
   //     },
-  //     {
-  //       id: uniqueId(),
-  //       title: 'Dialog',
-  //       icon: IconPoint,
-  //       href: '/ui-components/dialog',
-  //     },
+      // {
+      //   id: uniqueId(),
+      //   title: 'Dialog',
+      //   icon: IconPoint,
+      //   href: '/ui-components/dialog',
+      // },
   //     {
   //       id: uniqueId(),
   //       title: 'List',

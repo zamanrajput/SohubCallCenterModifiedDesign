@@ -5,6 +5,8 @@ import { IconPower } from '@tabler/icons-react';
 import { AppState } from '../../../../../store/Store';
 import Link from 'next/link';
 
+import { clearDb, getData, navigateTo } from '../../../../../utils/utils';
+
 export const Profile = () => {
   const customizer = useSelector((state: AppState) => state.customizer);
   const lgUp = useMediaQuery((theme: any) => theme.breakpoints.up('lg'));
@@ -22,17 +24,18 @@ export const Profile = () => {
           <Avatar alt="Remy Sharp" src={"/images/profile/user-1.jpg"} sx={{height: 40, width: 40}} />
 
           <Box>
-            <Typography variant="h6">Mathew</Typography>
-            <Typography variant="caption">Designer</Typography>
+            <Typography variant="h6">{getData().extension}</Typography>
+            <Typography variant="caption">Support</Typography>
           </Box>
           <Box sx={{ ml: 'auto' }}>
             <Tooltip title="Logout" placement="top">
               <IconButton
                 color="primary"
                 component={Link}
-                href="auth/auth1/login"
+                href="auth/login"
                 aria-label="logout"
                 size="small"
+                onClick={()=>{clearDb();}}
               >
                 <IconPower size="20" />
               </IconButton>

@@ -6,6 +6,7 @@ import Sidebar from "./vertical/sidebar/Sidebar";
 import Customizer from "./shared/customizer/Customizer";
 import Navigation from "../full/horizontal/navbar/Navigation";
 import HorizontalHeader from "../full/horizontal/header/Header";
+import { clearDb, getData, navigateTo } from "../../utils/utils";
 
 const MainWrapper = styled("div")(() => ({
   display: "flex",
@@ -31,6 +32,14 @@ interface Props {
 const FullLayout: React.FC<Props> = ({ children }) => {
   const customizer = useSelector((state: AppState) => state.customizer);
   const theme = useTheme();
+  const data = getData();
+
+
+    if(data.login_status===''){
+      navigateTo('/auth/login');
+    }
+  
+
 
   return (
     <MainWrapper>

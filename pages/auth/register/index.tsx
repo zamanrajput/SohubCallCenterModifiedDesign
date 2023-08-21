@@ -4,6 +4,7 @@ import PageContainer from "../../../src/components/container/PageContainer";
 import Logo from "../../../src/layouts/full/shared/logo/Logo";
 
 import AuthRegister from "../authForms/AuthRegister";
+import { appName } from "../../../src/utils/utils";
 
 const Register = () => (
   <PageContainer>
@@ -71,7 +72,7 @@ const Register = () => (
       >
         <Box p={4}>
           <AuthRegister
-            title="Welcome to Modernize"
+            title={"Welcome to "+appName}
             subtext={
               <Typography variant="subtitle1" color="textSecondary" mb={1}>
                 Your Admin Dashboard
@@ -84,7 +85,7 @@ const Register = () => (
                 </Typography>
                 <Typography
                   component={Link}
-                  href="/auth/auth1/login"
+                  href="/auth/login"
                   fontWeight="500"
                   sx={{
                     textDecoration: "none",

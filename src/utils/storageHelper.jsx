@@ -1,17 +1,6 @@
 
 
 
-export function getData(){
-    return localStorage.getItem('saved_data')??"";
-}
-
-
-export function saveData(){
-    localStorage.setItem('saved_data');
-}
-
-
-
 var calls = null;
 
 var counter = 0;

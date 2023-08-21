@@ -3,6 +3,7 @@ import { Grid, Box, Stack, Typography } from '@mui/material';
 import PageContainer from '../../../../src/components/container/PageContainer';
 import Logo from '../../../../src/layouts/full/shared/logo/Logo';
 import AuthLogin from '../../authForms/AuthLogin';
+import { appName } from '../../../../src/utils/utils';
 
 const Login = () => (
   <PageContainer>
@@ -66,7 +67,7 @@ const Login = () => (
       >
         <Box p={4}>
           <AuthLogin
-            title="Welcome to Modernize"
+            title={`Welcome to ${appName}`}
             subtext={
               <Typography variant="subtitle1" color="textSecondary" mb={1}>
                 Your Admin Dashboard
@@ -75,11 +76,11 @@ const Login = () => (
             subtitle={
               <Stack direction="row" spacing={1} mt={3}>
                 <Typography color="textSecondary" variant="h6" fontWeight="500">
-                  New to Modernize?
+                {`New to ${appName}?`}
                 </Typography>
                 <Typography
                   component={Link}
-                  href="/auth/auth1/register"
+                  href="/auth/register"
                   fontWeight="500"
                   sx={{
                     textDecoration: 'none',

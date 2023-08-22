@@ -35,7 +35,6 @@ const MakeGetWithAuthCall = (url:string, token:string,  callback:(error:any,resu
   fetch(url, {
     method: "GET",
     headers: myHeaders,
-    referrerPolicy:'unsafe_url' as ReferrerPolicy ,
     redirect: "follow",
   })
     .then((response) => {

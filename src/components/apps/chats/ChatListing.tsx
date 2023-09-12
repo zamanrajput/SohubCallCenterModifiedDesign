@@ -14,6 +14,7 @@ import {
   Button,
   Menu,
   MenuItem,
+  Icon,
 } from "@mui/material";
 import { useSelector, useDispatch } from "../../../store/Store";
 import Scrollbar from "../../custom-scroll/Scrollbar";
@@ -25,13 +26,19 @@ import {
 import { ChatsType } from "../../../types/apps/chat";
 import { last } from "lodash";
 import { formatDistanceToNowStrict } from "date-fns";
-import { IconChevronDown, IconSearch } from "@tabler/icons-react";
+import { IconChevronDown, IconDialpad, IconDialpadOff, IconGridDots, IconSearch } from "@tabler/icons-react";
+import { getUserData } from "../../../utils/utils";
+import { Cancel, Dialpad, Keyboard, ListAlt } from "@mui/icons-material";
+import AppButton from "../../shared/CustomButton";
+import AppDialpad from "../../shared/CustomDialpad";
+import { setOutgoingDialogVisibilty } from "../../../store/home/HomeSlice";
+import OutgoingCallDialog from "../../shared/OutGoingCall";
+import { DialByLine } from "../../../utils/SipDiamond";
 
 const ChatListing = () => {
-  // const [mounted, setMounted] = useState(false);
-  // useEffect(() => {
-  //   setMounted(true);
-  // }, []);
+
+  const data = useSelector((state)=>state.homeReducer);
+
 
   const dispatch = useDispatch();
   const activeChat = useSelector((state) => state.chatReducer.chatContent);
@@ -71,15 +78,55 @@ const ChatListing = () => {
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
 
+
+  const [dialpadOpen, setDialPadOpen] = useState<boolean>(false);
+
+  const userData = getUserData();
+
+
+  const [num,setNumberStr] = useState<string>('');
+
+  const onCharReceived =(char:string)=>{
+    setNumberStr(num+char);
+  }
+
+
+  function onCallButtonClick(number:string) {
+    const opts:any =   {
+      type: "audio",
+      num: number,
+    };
+
+    DialByLine(opts);
+
+    // setCalls(
+    //   saveToHistory({
+    //     event: "Dialed Call",
+    //     type: "Call",
+    //     number: number,
+    //     time: dayjs().format("hh:mm:ss"),
+    //     date: dayjs().format("DD/MM/YY"),
+    //   })
+    // );
+  }
+
+
+
+
   return (
     <div>
+
+
+
       {/* ------------------------------------------- */}
       {/* Profile */}
       {/* ------------------------------------------- */}
@@ -94,43 +141,52 @@ const ChatListing = () => {
           color="success"
         >
           <Avatar
-            alt="Remy Sharp"
-            src="/images/profile/user-1.jpg"
+            alt={userData.user_name}
+            src={userData.avatar}
             sx={{ width: 54, height: 54 }}
           />
         </Badge>
         <Box>
           <Typography variant="body1" fontWeight={600}>
-            John Deo
+            {userData.user_name}
           </Typography>
-          <Typography variant="body2">Marketing Manager</Typography>
+          <Typography variant="body2">{`Ext: ${userData.extension}`}</Typography>
+          <Typography variant="body2">Online</Typography>
         </Box>
       </Box>
+
+
       {/* ------------------------------------------- */}
       {/* Search */}
       {/* ------------------------------------------- */}
-      <Box px={3} py={1}>
-        <TextField
-          id="outlined-search"
-          placeholder="Search contacts"
-          size="small"
-          type="search"
-          variant="outlined"
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconSearch size={"16"} />
-              </InputAdornment>
-            ),
-          }}
-          fullWidth
-          onChange={(e) => dispatch(SearchChat(e.target.value))}
-        />
-      </Box>
+      {!dialpadOpen ? <Box px={3} py={1}>
+        <div style={{ display: 'flex' }}>
+          <TextField
+            id="outlined-search"
+            placeholder="Search contacts"
+            size="small"
+            type="search"
+            variant="outlined"
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconSearch size={"16"} />
+                </InputAdornment>
+              ),
+            }}
+            fullWidth
+            onChange={(e) => dispatch(SearchChat(e.target.value))}
+          />
+
+          <AppButton onClick={() => setDialPadOpen(!dialpadOpen)} child={<Dialpad />} />
+        </div>
+
+      </Box> : null}
+
       {/* ------------------------------------------- */}
       {/* Contact List */}
       {/* ------------------------------------------- */}
-      <List sx={{ px: 0 }}>
+      {!dialpadOpen ? <List sx={{ px: 0 }}>
         <Box px={2.5} pb={1}>
           <Button
             id="basic-button"
@@ -181,10 +237,10 @@ const ChatListing = () => {
                       chat.status === "online"
                         ? "success"
                         : chat.status === "busy"
-                        ? "error"
-                        : chat.status === "away"
-                        ? "warning"
-                        : "secondary"
+                          ? "error"
+                          : chat.status === "away"
+                            ? "warning"
+                            : "secondary"
                     }
                     variant="dot"
                     anchorOrigin={{
@@ -229,7 +285,49 @@ const ChatListing = () => {
             </Box>
           )}
         </Scrollbar>
-      </List>
+      </List> : null}
+
+
+      {dialpadOpen ? <Box px={3} py={1}>
+        <div style={{ display: 'flex' }}>
+          <TextField
+            id="outlined-search"
+            placeholder="Type Number"
+            size="small"
+            type="numeric"
+            value={num}
+            variant="outlined"
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Cancel color="error" onClick={() => setNumberStr('')} />
+                </InputAdornment>
+              ),
+            }}
+            fullWidth
+            onChange={(e) => { }}
+          />
+
+          <AppButton onClick={() => setDialPadOpen(!dialpadOpen)} child={<ListAlt />} />
+        </div>
+
+      </Box> : null}
+
+
+
+      {dialpadOpen ? <Box px={3} py={0}>
+        <AppDialpad onCharReceived={onCharReceived} />
+
+        <div style={{ width: '100%',flex:1,display:'flex',justifyContent:'center',marginTop:'10px' }}>
+          {num.length>0?     <Button onClick={()=>{dispatch(setOutgoingDialogVisibilty(true));onCallButtonClick(num);}} sx={{width:'85%',height:'50px',color:'white',background:"green"}} color="success" variant="contained" fullWidth>
+            Call
+          </Button>:null}
+     
+        </div>
+
+
+      </Box> : null}
+
     </div>
   );
 };

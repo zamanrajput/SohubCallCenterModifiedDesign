@@ -31,7 +31,7 @@ import "slick-carousel/slick/slick-theme.css";
 import "../src/components/pages/home/DialPad/DialPad.css";
 import "../src/globals.css";
 
-// Client-side cache, shared for the whole session of the user in the browser.
+
 const clientSideEmotionCache = createEmotionCache();
 
 interface MyAppProps extends AppProps {
@@ -60,7 +60,7 @@ const MyApp = (props: MyAppProps) => {
     <CacheProvider value={emotionCache}>
       <Head>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
-        <title>Dream Project</title>
+        <title>Call Center</title>
       </Head>
       <NextNProgress color="#5D87FF" />
       <ThemeProvider theme={theme}>

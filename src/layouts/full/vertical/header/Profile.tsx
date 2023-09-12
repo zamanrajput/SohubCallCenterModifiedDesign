@@ -13,6 +13,7 @@ import * as dropdownData from './data';
 
 import { IconMail } from '@tabler/icons-react';
 import { Stack } from '@mui/system';
+import { clearDb, getUserData } from '../../../../utils/utils';
 
 
 const Profile = () => {
@@ -40,8 +41,8 @@ const Profile = () => {
         onClick={handleClick2}
       >
         <Avatar
-          src={"/images/profile/user-1.jpg"}
-          alt={'ProfileImg'}
+          src={getUserData().avatar}
+          alt={getUserData().user_name}
           sx={{
             width: 35,
             height: 35,
@@ -68,13 +69,13 @@ const Profile = () => {
       >
         <Typography variant="h5">User Profile</Typography>
         <Stack direction="row" py={3} spacing={2} alignItems="center">
-        <Avatar src={"/images/profile/user-1.jpg"} alt={"ProfileImg"} sx={{ width: 95, height: 95 }} />
+        <Avatar src={getUserData().avatar} alt={"ProfileImg"} sx={{ width: 95, height: 95 }} />
           <Box>
             <Typography variant="subtitle2" color="textPrimary" fontWeight={600}>
-              Mathew Anderson
+             {getUserData().user_name}
             </Typography>
             <Typography variant="subtitle2" color="textSecondary">
-              Designer
+              Online
             </Typography>
             <Typography
               variant="subtitle2"
@@ -84,7 +85,7 @@ const Profile = () => {
               gap={1}
             >
               <IconMail width={15} height={15} />
-              info@modernize.com
+              {`${getUserData().extension}@sohub.com`}
             </Typography>
           </Box>
         </Stack>
@@ -156,7 +157,7 @@ const Profile = () => {
               <img src={"/images/backgrounds/unlimited-bg.png"} alt="unlimited" className="signup-bg" width={150} height={183}></img>
             </Box>
           </Box>
-          <Button href="/auth/login" variant="outlined" color="primary" component={Link} fullWidth>
+          <Button onClick={()=>{clearDb()}} href="/auth/login" variant="outlined" color="primary" component={Link} fullWidth>
             Logout
           </Button>
         </Box>

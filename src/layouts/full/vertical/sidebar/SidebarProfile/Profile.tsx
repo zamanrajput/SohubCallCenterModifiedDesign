@@ -5,7 +5,7 @@ import { IconPower } from '@tabler/icons-react';
 import { AppState } from '../../../../../store/Store';
 import Link from 'next/link';
 
-import { clearDb, getData, navigateTo } from '../../../../../utils/utils';
+import { clearDb, getUserData, navigateTo } from '../../../../../utils/utils';
 
 export const Profile = () => {
   const customizer = useSelector((state: AppState) => state.customizer);
@@ -24,7 +24,7 @@ export const Profile = () => {
           <Avatar alt="Remy Sharp" src={"/images/profile/user-1.jpg"} sx={{height: 40, width: 40}} />
 
           <Box>
-            <Typography variant="h6">{getData().extension}</Typography>
+            <Typography variant="h6">{getUserData().extension}</Typography>
             <Typography variant="caption">Support</Typography>
           </Box>
           <Box sx={{ ml: 'auto' }}>

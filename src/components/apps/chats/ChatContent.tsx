@@ -24,7 +24,6 @@ import { useSelector } from "../../../store/Store";
 import { ChatsType } from "../../../types/apps/chat";
 import { formatDistanceToNowStrict } from "date-fns";
 import ChatInsideSidebar from "./ChatInsideSidebar";
-import Scrollbar from "../../../components/custom-scroll/Scrollbar";
 
 interface ChatContentProps {
   toggleChatSidebar: () => void;

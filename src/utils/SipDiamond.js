@@ -1475,8 +1475,8 @@ var remoteAudio = null;
  * @param {string} CallerID (optional) If no buddy provided, one is generated automatically using this callerID and the numToDial
  * @param {Array<string>} extraHeaders = (optional) Array of headers to include in the INVITE eg: ["foo: bar"] (Note the space after the :)
  */
-export function DialByLine({ type, num, name, audioElementRef }) {
-  remoteAudio = audioElementRef;
+export function DialByLine({ type, num, name }) {
+  
   console.log("audio element:" + remoteAudio == null);
   if (userAgent == null) {
     console.log("User is not Registered");

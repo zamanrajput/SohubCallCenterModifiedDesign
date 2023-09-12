@@ -22,7 +22,6 @@ import {
   BsCalendar2Day,
   BsCheckLg,
   BsClock,
-  BsFillTelephoneFill,
   BsFilter,
   BsPencil,
   BsTextCenter,
@@ -41,6 +40,7 @@ import dayjs from "dayjs";
 import ExpandableComponent from "../../src/components/pages/home/ExpandableComponent";
 import AudioDeviceList from "../../src/components/pages/home/AudioDevicesList";
 import { ContextMenu } from "react-contextmenu";
+import { useDispatch } from "react-redux";
 
 const Home = () => {
   const [inCall, setInCall] = useState(false);
@@ -49,7 +49,7 @@ const Home = () => {
     useState("+(92) 3400755136");
 
   const [callStatus, setCallStatus] = useState("None");
-  const [callSession, setCallSession] = useState(null);
+
   const [callDuration, setCallDuration] = useState(0);
   const [calls, setCalls] = useState(loadCallsHistory());
   const [callCount, setCallCount] = useState(0);
@@ -133,6 +133,20 @@ const Home = () => {
     bindOutgoingBacks(outgoingCallbacks, ref.current);
   }, []);
 
+  function convertSecondsToHMS(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+
+    const formattedHours = hours.toString().padStart(2, "0");
+    const formattedMinutes = minutes.toString().padStart(2, "0");
+    const formattedSeconds = remainingSeconds.toString().padStart(2, "0");
+
+    return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+  }
+
+
+
   function onCallButtonClick(number) {
     DialByLine({
       type: "audio",
@@ -151,17 +165,6 @@ const Home = () => {
     );
   }
 
-  function convertSecondsToHMS(seconds) {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const remainingSeconds = seconds % 60;
-
-    const formattedHours = hours.toString().padStart(2, "0");
-    const formattedMinutes = minutes.toString().padStart(2, "0");
-    const formattedSeconds = remainingSeconds.toString().padStart(2, "0");
-
-    return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
-  }
 
   function startTimer() {
     const seconds = getCounter();
@@ -259,13 +262,17 @@ const Home = () => {
     );
   }
 
+  const dispatch = useDispatch();
+
   useEffect(() => {
+    dispatch(setAudioSinkRef(ref.current))
     CreateUserAgent({
-      audioElementRef: ref.current,
+    
       onStatusChange: (status) => {
         console.log(status);
       },
     });
+
   }, []);
   return (
     <>

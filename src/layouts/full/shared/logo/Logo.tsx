@@ -18,24 +18,29 @@ const Logo = () => {
     return (
       <LinkStyled href="/">
         {customizer.activeMode === "dark" ? (
-          // <Image
-          //   src="/images/logos/light-logo.svg"
-          //   alt="logo"
-          //   height={customizer.TopbarHeight}
-          //   width={174}
-          //   priority
-          // />
+          <Image
+            src={"/logo_with_text.png"}
+            alt="logo"
+            // height={customizer.TopbarHeight}
+            height={40}
+            style={{marginTop:'10px'}}
+            width={174}
+            
+            priority
+          />
 
-          <h1>Call Center</h1>
         ) : (
-          // <Image
-          //   src={"/images/logos/dark-logo.svg"}
-          //   alt="logo"
-          //   height={customizer.TopbarHeight}
-          //   width={174}
-          //   priority
-          // />
-          <h1>Call Center</h1>
+          <Image
+            src={"/logo_with_text.png"}
+            alt="logo"
+            // height={customizer.TopbarHeight}
+            height={40}
+            style={{marginTop:'10px'}}
+            width={174}
+            
+            priority
+          />
+
 
         )}
       </LinkStyled>

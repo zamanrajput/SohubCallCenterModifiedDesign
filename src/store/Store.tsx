@@ -3,6 +3,7 @@ import CustomizerReducer from './customizer/CustomizerSlice';
 import EcommerceReducer from './apps/eCommerce/ECommerceSlice';
 import ChatsReducer from './apps/chat/ChatSlice';
 import NotesReducer from './apps/notes/NotesSlice';
+import HomeReducer from './home/HomeSlice'
 import EmailReducer from './apps/email/EmailSlice';
 import TicketReducer from './apps/tickets/TicketSlice';
 import ContactsReducer from './apps/contacts/ContactSlice';
@@ -16,7 +17,9 @@ import {
 } from 'react-redux';
 
 export const store = configureStore({
+  
   reducer: {
+    homeReducer :HomeReducer,
     customizer: CustomizerReducer,
     ecommerceReducer: EcommerceReducer,
     chatReducer: ChatsReducer,
@@ -30,6 +33,7 @@ export const store = configureStore({
 });
 
 const rootReducer = combineReducers({
+  homeReducer: HomeReducer,
   customizer: CustomizerReducer,
   ecommerceReducer: EcommerceReducer,
   chatReducer: ChatsReducer,

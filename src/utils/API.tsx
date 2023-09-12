@@ -1,9 +1,11 @@
 import { Password } from "@mui/icons-material";
 import {
+  URL_FORGET_PASSWORD,
   URL_LOGIN
 } from "./API_LINKS";
 
 import { clearDb, navigateTo } from "./utils";
+import axios from "axios";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 const MakePostCall = (url:string, requestBody:object, callback:(error:any,result:any)=>any) => {
@@ -55,4 +57,18 @@ const MakeGetWithAuthCall = (url:string, token:string,  callback:(error:any,resu
 
 export function loginWithPanel(username:string,password:string, onComplete:(error:any,result:any)=>any) {
   MakeGetWithAuthCall(URL_LOGIN+"?username="+username+"&password="+password,'', onComplete);
+}
+
+async function getAsync(url: string): Promise<any> {
+  try {
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+
+export function forgetPassword(email:string):Promise<any>{
+  return getAsync(URL_FORGET_PASSWORD+email);
 }

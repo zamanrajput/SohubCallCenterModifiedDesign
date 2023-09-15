@@ -265,13 +265,7 @@ const Home = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(setAudioSinkRef(ref.current))
-    CreateUserAgent({
-    
-      onStatusChange: (status) => {
-        console.log(status);
-      },
-    });
+  
 
   }, []);
   return (

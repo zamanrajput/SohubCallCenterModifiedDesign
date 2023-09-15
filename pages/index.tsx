@@ -1,69 +1,69 @@
-
-import { useEffect, useState, useRef } from 'react';
-import { Box, Divider, Grid } from "@mui/material";
-import PageContainer from "../src/components/container/PageContainer";
-import Breadcrumb from '../src/layouts/full/shared/breadcrumb/Breadcrumb';
-import AppCard from '../src/components/shared/AppCard';
-import ChatSidebar from '../src/components/apps/chats/ChatSidebar';
-import ChatContent from '../src/components/apps/chats/ChatContent';
-import ChatMsgSent from '../src/components/apps/chats/ChatMsgSent';
+import { useEffect, useState, useRef } from "react";
 import {
-  AnswerAudioCall,
-  CreateUserAgent,
-  DialByLine,
-  RejectCall,
-  bindIncomingCallBacks,
-  bindOutgoingBacks,
-  clearObjs,
-  earlyHangUp,
-  endSession,
-  rejectInvite,
-} from "../src/utils/SipDiamond.js";
-import OutgoingCallDialog from '../src/components/shared/OutGoingCall';
-import IncomingCallDialog from '../src/components/shared/IncomingCall';
-import { dispatch, useSelector } from '../src/store/Store';
-import { setAudioSinkRef, setInCall, setIncomingCallStatus, setIncomingDialogVisibilty, setIncomingExtNum, setOutgoingCallStatus, setOutgoingDialogVisibilty } from '../src/store/home/HomeSlice';
+  Box,
+  Breadcrumbs,
+  Button,
+  Container,
+  Divider,
+  Grid,
+  Icon,
+  Theme,
+  Typography,
+} from "@mui/material";
+import PageContainer from "../src/components/container/PageContainer";
+import Breadcrumb from "../src/layouts/full/shared/breadcrumb/Breadcrumb";
+import AppCard from "../src/components/shared/AppCard";
+import ChatSidebar from "../src/components/apps/chats/ChatSidebar";
+import ChatContent from "../src/components/apps/chats/ChatContent";
+import ChatMsgSent from "../src/components/apps/chats/ChatMsgSent";
+import { CreateUserAgent } from "../src/utils/SipDiamond.js";
 
-
-
-
+import OutgoingCallDialog from "../src/components/shared/OutGoingCall";
+import IncomingCallDialog from "../src/components/shared/IncomingCall";
+import { dispatch, useSelector } from "../src/store/Store";
+import {
+  setAudioSinkRef,
+  setInCall,
+  setInCallExtNumber,
+  setInCallStatus,
+  setInCallUsername,
+  setIncomingCallStatus,
+  setIncomingDialogVisibilty,
+  setIncomingExtNum,
+  setOutGoingExtNum,
+  setOutGoingUserName,
+  setOutgoingCallStatus,
+  setOutgoingDialogVisibilty,
+} from "../src/store/home/HomeSlice";
+import InCallLayout from "../src/layouts/full/shared/incall/InCallLayout";
 
 export default function Modern() {
-
   const ref = useRef(null);
 
 
 
-  const [outGoingDialog,setOutGoingDialogVisibilty] = useState<boolean>(false);
-
   const [isLoading, setLoading] = useState(true);
-
-
 
   const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-
   const incomingCallbacks = {
-    onStatusChange: function onStatusChange(str:string) {
+    onStatusChange: function onStatusChange(str: string) {
       console.log("incomingCallbacks", "status:" + str);
       dispatch(setIncomingCallStatus(str));
     },
     onEnd: function onEnd() {
       console.log("incomingCallbacks", "onEnd");
       dispatch(setInCall(false));
-      dispatch(setIncomingCallStatus('Ended'));
-      
+      dispatch(setIncomingCallStatus("Ended"));
     },
     onSuccess: function onSuccess() {
       //call started now or established now
       console.log("incomingCallbacks", "Success");
-      dispatch(setIncomingCallStatus('Established'));
+      dispatch(setIncomingCallStatus("Established"));
 
-      // if (getCounter() === 0) {
-      //   startTimer();
-      // }
+  
     },
-    onInvite: function onInvite(inviterId:string) {
+    onInvite: function onInvite(inviterId: string) {
       //working fine
       dispatch(setIncomingCallStatus("Invited"));
       dispatch(setIncomingExtNum(inviterId));
@@ -76,64 +76,75 @@ export default function Modern() {
       dispatch(setInCall(false));
     },
   };
+
   const outgoingCallbacks = {
     onTry: () => {
-      dispatch(setOutgoingCallStatus('Calling...'))
+      dispatch(setOutgoingCallStatus("Calling..."));
       console.log("outgoinCallbacks", "onTry");
     },
     onRinging: () => {
-      dispatch(setOutgoingCallStatus('Ringing...'))
+      dispatch(setOutgoingCallStatus("Ringing..."));
       console.log("outgoinCallbacks", "onRinging");
     },
     onAccept: () => {
-      dispatch(setOutgoingDialogVisibilty(false));
+      console.log(data.outGoingExtNum);
+      console.log("Zaman khuhsh ho ja");
+      dispatch(setInCallExtNumber(data.outGoingExtNum));
+      dispatch(setInCallUsername(data.outGoingUserName));
+      dispatch(setInCallStatus("Established"));
       dispatch(setInCall(true));
-      console.log("outgoinCallbacks", "onAccept");
-      dispatch(setOutgoingCallStatus('Established'));
+      dispatch(setOutgoingDialogVisibilty(false));
       // startTimer();
     },
     onReject: () => {
-      dispatch(setOutgoingCallStatus('Call Ended'));
+      dispatch(setOutgoingCallStatus("Call Rejected"));
       dispatch(setOutgoingDialogVisibilty(false));
+      dispatch(setOutgoingCallStatus(""));
+      dispatch(setOutGoingExtNum(""));
+      dispatch(setOutGoingUserName(""));
       dispatch(setInCall(false));
       console.log("outgoinCallbacks", "onReject");
-   
     },
     onEnd: () => {
       console.log("outgoinCallbacks", "onEnd");
 
-      dispatch(setOutgoingCallStatus('Call Ended'));
+      dispatch(setOutgoingCallStatus("Call Ended"));
       dispatch(setOutgoingDialogVisibilty(false));
+
+      console.log("XYZ:DATA CLEARED");
       dispatch(setInCall(false));
+      dispatch(setInCallExtNumber(""));
+      dispatch(setInCallUsername(""));
+      dispatch(setInCallStatus(""));
+
+      dispatch(setOutgoingDialogVisibilty(false));
+      dispatch(setOutgoingCallStatus(""));
+      dispatch(setOutGoingExtNum(""));
+      dispatch(setOutGoingUserName(""));
     },
 
     onRedirect: () => {
-    
       console.log("outgoinCallbacks", "onRedirect");
-      dispatch(setOutgoingCallStatus('Redirecting'));
+      dispatch(setOutgoingCallStatus("Redirecting"));
       dispatch(setOutgoingDialogVisibilty(true));
-
-
     },
     onHang: () => {
-      dispatch(setOutgoingCallStatus('Call Ended'));
+      dispatch(setOutgoingCallStatus("Call Ended"));
       dispatch(setOutgoingDialogVisibilty(false));
       dispatch(setInCall(false));
 
-      // clearObjs();
     },
   };
 
   useEffect(() => {
-    bindIncomingCallBacks(incomingCallbacks, ref.current);
-    bindOutgoingBacks(outgoingCallbacks, ref.current);
+    // bindIncomingCallBacks(incomingCallbacks);
+    // bindOutgoingBacks(outgoingCallbacks);
   }, []);
 
   useEffect(() => {
     setLoading(false);
   }, []);
   useEffect(() => {
-    setAudioSinkRef(ref.current);
     CreateUserAgent({
       audioElementRef: ref.current,
       onStatusChange: (status: any) => {
@@ -141,8 +152,6 @@ export default function Modern() {
       },
     });
   }, []);
-
-
 
   // function startTimer() {
   //   const seconds = getCounter();
@@ -158,31 +167,23 @@ export default function Modern() {
   //   }, 1000);
   // }
 
-  const data = useSelector((state)=>state.homeReducer)
-
-  function endCall() {
-    if ( data.incomingCallStatus=== "Established" || data.outgoingCallStatus==="Established") endSession();
-    else {
-      earlyHangUp();
-    }
-  }
-
+  const data = useSelector((state) => state.homeReducer);
 
   return (
     <PageContainer>
-      <Breadcrumb title="Sohub Call Center" subtitle="Messenger" />
-      <OutgoingCallDialog/>
-      <IncomingCallDialog/>
+      {data.inCall ? (
+        <InCallLayout />
+      ) : (
+        <Breadcrumb title="Sohub Call Center" subtitle="Messenger" />
+      )}
+
+      <OutgoingCallDialog />
+      <IncomingCallDialog />
       <AppCard>
         {/* ------------------------------------------- */}
         {/* Left part */}
         {/* ------------------------------------------- */}
-        <audio
-          autoPlay
-          ref={ref}
-          controls
-          style={{ display: "none" }}
-        ></audio>
+        <audio autoPlay ref={ref} controls style={{ display: "none" }}></audio>
         <ChatSidebar
           isMobileSidebarOpen={isMobileSidebarOpen}
           onSidebarClose={() => setMobileSidebarOpen(false)}
@@ -199,5 +200,4 @@ export default function Modern() {
       </AppCard>
     </PageContainer>
   );
-};
-
+}

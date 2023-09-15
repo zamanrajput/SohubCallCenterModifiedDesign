@@ -846,10 +846,6 @@ export function endSession() {
   });
 
   teardownSession(lineObj);
-  clearObjs();
-  incomingCallBacks?.onEnd();
-  outgoingCallbacks?.onEnd();
-  // updateLineScroll(lineNum);
 }
 
 export function sendDTMF(itemStr) {
@@ -1475,7 +1471,7 @@ var remoteAudio = null;
  * @param {string} CallerID (optional) If no buddy provided, one is generated automatically using this callerID and the numToDial
  * @param {Array<string>} extraHeaders = (optional) Array of headers to include in the INVITE eg: ["foo: bar"] (Note the space after the :)
  */
-export function DialByLine({ type, num, name }) {
+export function DialByLine({ type, num, name,callBacks }) {
   
   console.log("audio element:" + remoteAudio == null);
   if (userAgent == null) {
@@ -1528,11 +1524,13 @@ export function DialByLine({ type, num, name }) {
 
   // Start Call Invite
   if (type == "audio") {
-    AudioCall(lineObj, numDial, null);
+    AudioCall(lineObj, numDial, null,callBacks);
   } else {
     VideoCall(lineObj, numDial);
   }
 }
+
+
 var Buddy = function (
   type,
   identity,
@@ -1577,10 +1575,12 @@ var Buddy = function (
 };
 
 export function earlyHangUp() {
+  if(lineObj==null) return;
+  if(lineObj.se)
   lineObj.SipSession.cancel();
 }
 
-function AudioCall(lineObj, dialledNumber, extraHeaders, customHooks) {
+function AudioCall(lineObj, dialledNumber, extraHeaders, outgoingCallbacks) {
   if (userAgent == null) return;
   if (userAgent.isRegistered() == false) return;
   if (lineObj == null) return;
@@ -1670,8 +1670,7 @@ function AudioCall(lineObj, dialledNumber, extraHeaders, customHooks) {
   lineObj.SipSession.isOnHold = false;
   lineObj.SipSession.delegate = {
     onBye: function (sip) {
-      outgoingCallbacks?.onEnd();
-      setTimeout(outgoingCallbacks?.onHang(), 2000);
+      outgoingCallbacks?.onHang();
       onSessionReceivedBye(lineObj, sip);
     },
     onMessage: function (sip) {
@@ -1684,6 +1683,9 @@ function AudioCall(lineObj, dialledNumber, extraHeaders, customHooks) {
       onSessionDescriptionHandlerCreated(lineObj, sdh, provisional, false);
     },
   };
+
+
+
   var inviterOptions = {
     requestDelegate: {
       // OutgoingRequestDelegate
@@ -1710,9 +1712,9 @@ function AudioCall(lineObj, dialledNumber, extraHeaders, customHooks) {
       },
     },
   };
+
   lineObj.SipSession.invite(inviterOptions).catch(function (e) {
     console.warn("Failed to send INVITE:", e);
-    setTimeout(customHooks.onHang(), 1000);
   });
 }
 
@@ -2190,7 +2192,6 @@ function onInviteCancel(lineObj, response) {
 }
 // Both Incoming an outgoing INVITE
 function onInviteAccepted(lineObj, includeVideo, response) {
-  incomingCallBacks?.onSuccess();
 
   // Call in progress
   var session = lineObj.SipSession;
@@ -2567,35 +2568,26 @@ function teardownSession(lineObj) {
   // Check if this call was missed
   if (session.data.calldirection == "inbound") {
     if (session.data.earlyReject) {
-      // Call was rejected without even ringing
       // IncreaseMissedBadge(session.data.buddyId);
       console.log("Missed call from " + session.data.buddyId);
     } else if (
       session.data.terminateby == "them" &&
       session.data.startTime == null
     ) {
-      // Call Terminated by them during ringing
+      
       if (session.data.reasonCode == 0) {
         // Call was canceled, and not answered elsewhere
         // IncreaseMissedBadge(session.data.buddyId);
         console.log("Not Answered, terminated by them");
-        incomingCallBacks.onStatusChange("Call Cancelled by remote User");
-        setTimeout(() => incomingCallBacks.onCancleInvite());
       }
     }
   }
 }
 
 var incomingCallBacks = {};
-var outgoingCallbacks = {};
 
-export function bindIncomingCallBacks(callBacks, audioElementRef) {
+export function bindIncomingCallBacks(callBacks) {
   incomingCallBacks = callBacks;
-  remoteAudio = audioElementRef;
-}
-export function bindOutgoingBacks(callBacks, audioElementRef) {
-  outgoingCallbacks = callBacks;
-  remoteAudio = audioElementRef;
 }
 
 var invitation = null;
@@ -2614,7 +2606,6 @@ function ReceiveCall(session) {
   if (typeof callerID === "undefined") callerID = did;
 
   console.log("New Incoming Call!", callerID + " <" + did + ">");
-  incomingCallBacks.onInvite(did);
 
   var CurrentCalls = countSessions(session.id);
   console.log("Current Call Count:", CurrentCalls);
@@ -3064,12 +3055,9 @@ function AnswerVideoCall(lineNumber) {
   // Check vitals
   if (HasAudioDevice == false) {
     window.alert("No Mic Found");
-    // //"#line-" + lineObj.LineNumber + "-msg").html(lang.call_failed);
-    // //"#line-" + lineObj.LineNumber + "-AnswerCall").hide();
     return;
   }
 
-  // Update UI
 
   // Start SIP handling
   var supportedConstraints = navigator.mediaDevices.getSupportedConstraints();
@@ -3422,8 +3410,8 @@ export function AttendedTransfer(num, callbacks) {
         // }, 1000);
       },
       onReject: function (sip) {
-        console.log("New call session rejected: ", sip.message.reasonPhrase);
-        this.onReject();
+        // console.log("New call session rejected: ", sip.message.reasonPhrase);
+        callbacks?.onBye();
         session.data.transfer[transferId].disposition =
           sip.message.reasonPhrase;
         session.data.transfer[transferId].dispositionTime = utcDateNow();

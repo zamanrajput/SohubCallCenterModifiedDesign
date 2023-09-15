@@ -10,11 +10,10 @@
     "post-update": "echo \"codesandbox preview only, need an update\" && yarn upgrade --latest"
   },
   "dependencies": {
-    "@emotion/cache": "11.10.5",
+    "@emotion/cache": "^11.11.0",
     "@emotion/react": "11.10.6",
     "@emotion/server": "11.10.0",
     "@emotion/styled": "11.10.6",
-    "@mui/base": "^5.0.0-beta.14",
     "@mui/icons-material": "5.11.9",
     "@mui/lab": "^5.0.0-alpha.117",
     "@mui/material": "5.11.10",
@@ -28,6 +27,7 @@
     "axios-mock-adapter": "^1.21.2",
     "chance": "^1.1.9",
     "date-fns": "^2.29.3",
+    "dayjs": "^1.11.9",
     "emoji-picker-react": "4.4.7",
     "formik": "^2.2.9",
     "formik-mui": "^5.0.0-alpha.0",
@@ -70,7 +70,7 @@
     "autoprefixer": "^10.4.15",
     "eslint": "8.35.0",
     "eslint-config-next": "13.2.1",
-    "postcss": "^8.4.28",
+    "postcss": "^8.4.29",
     "tailwindcss": "^3.3.3",
     "typescript": "4.9.5"
   }

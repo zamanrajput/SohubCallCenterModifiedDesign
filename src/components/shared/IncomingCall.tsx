@@ -11,7 +11,6 @@ import {
   Slide,
   Typography,
 } from "@mui/material";
-import { TransitionProps } from "@mui/material/transitions";
 import { useSelector, useDispatch } from "../../store/Store";
 import { setInCall, setIncomingDialogVisibilty, setOutgoingDialogVisibilty } from "../../store/home/HomeSlice";
 import { AnswerAudioCall, RejectCall } from "../../utils/SipDiamond";

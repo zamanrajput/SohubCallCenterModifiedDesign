@@ -10,21 +10,27 @@ interface StateType {
     incomingCallStatus: string,
     incomingCallDialogVisiblity: boolean,
     inCall:boolean,
-    audioRef:any
+    audioRef:any,
+    inCallExtNumber:string,
+    inCallUserName:string,
+    inCallStatus:string
 
 }
 
 const initialState: StateType = {
-    outGoingUserName: 'Zaman',
-    outGoingExtNum: '+121-122-2341',
-    outgoingCallStatus: 'Calling...',
+    outGoingUserName: '',
+    outGoingExtNum: '',
+    outgoingCallStatus: '',
     outgoingCallDialogVisiblity: false,
-    incomingUserName: 'Zaman',
-    incomingExtNum: '+121-122-2341',
-    incomingCallStatus: 'Unestablished',
+    incomingUserName: '',
+    incomingExtNum: '',
+    incomingCallStatus: '',
     incomingCallDialogVisiblity:false,
     inCall:false,
-    audioRef:null
+    audioRef:null,
+    inCallExtNumber:'',
+    inCallStatus:'',
+    inCallUserName:""
 }
 
 
@@ -61,11 +67,22 @@ export const HomeSlice = createSlice({
         },
         setAudioSinkRef(state:StateType,action){
             state.audioRef = action.payload;
+        },
+        setInCallStatus(state:StateType,action){
+            state.inCallStatus = action.payload;
+        }
+        ,
+        setInCallUsername(state:StateType,action){
+            state.inCallUserName = action.payload;
+        }
+        ,
+        setInCallExtNumber(state:StateType,action){
+            state.inCallExtNumber = action.payload;
         }
         
     }
 });
 
-export const { setAudioSinkRef,setInCall,setOutGoingUserName, setOutGoingExtNum, setOutgoingDialogVisibilty,setOutgoingCallStatus,setIncomingCallStatus,setIncomingUserName, setIncomingExtNum, setIncomingDialogVisibilty } = HomeSlice.actions;
+export const { setInCallExtNumber,setInCallStatus,setInCallUsername,setAudioSinkRef,setInCall,setOutGoingUserName, setOutGoingExtNum, setOutgoingDialogVisibilty,setOutgoingCallStatus,setIncomingCallStatus,setIncomingUserName, setIncomingExtNum, setIncomingDialogVisibilty } = HomeSlice.actions;
 
 export default HomeSlice.reducer;

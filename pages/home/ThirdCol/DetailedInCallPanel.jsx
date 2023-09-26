@@ -95,7 +95,7 @@ const DetailedInCallLayout = ({
   };
 
   function transferCall(type, num) {
-    console.log(type, num);
+    //(type, num);
     setTransferNum(num);
     if (type === "blind") {
       BlindTransfer(num, {
@@ -174,7 +174,7 @@ const DetailedInCallLayout = ({
         //do the unhold
       },
       onError: (e) => {
-        console.log(e);
+        //(e);
         //can do unhold with warning
       },
     });
@@ -190,7 +190,7 @@ const DetailedInCallLayout = ({
     conferenceCallMember.session.bye().catch(function (e) {
       console.warn("Failed to bye the session!", e);
     });
-    console.log("New call session end");
+    //("New call session end");
     var confCallId = conferenceCallMember.session.data.confcalls.length - 1;
     conferenceCallMember.session.data.confcalls[confCallId].accept.disposition =
       "bye";

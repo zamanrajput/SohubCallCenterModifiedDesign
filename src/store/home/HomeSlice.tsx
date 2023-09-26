@@ -1,4 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit"
+import User from "../../types/auth/User";
+import { AppDispatch } from "../Store";
 
 interface StateType {
     outGoingUserName: string,
@@ -13,8 +15,12 @@ interface StateType {
     audioRef:any,
     inCallExtNumber:string,
     inCallUserName:string,
-    inCallStatus:string
-
+    inCallStatus:string,
+    errorDialogVisibility:boolean,
+    errorDialogMessage:string,
+    errorDialogTitle:string,
+    inCallUser:User|null,
+    inCallTimer:any
 }
 
 const initialState: StateType = {
@@ -30,7 +36,13 @@ const initialState: StateType = {
     audioRef:null,
     inCallExtNumber:'',
     inCallStatus:'',
-    inCallUserName:""
+    inCallUserName:"",
+    errorDialogVisibility:false,
+    errorDialogTitle:"Error",
+    errorDialogMessage:"Error Message",
+    inCallUser:null,
+    inCallTimer:0
+
 }
 
 
@@ -38,6 +50,13 @@ export const HomeSlice = createSlice({
     name: "Home",
     initialState: initialState,
     reducers: {
+        resetTimer(state:StateType,action){
+            state.inCallTimer = 0;
+        },
+        setIncreamentTimer(state:StateType,action){
+            state.inCallTimer = state.inCallTimer + 1;
+            //(state.inCallTimer);
+        },
         setOutGoingUserName(state: StateType, action) {
             state.outGoingUserName = action.payload;
         },
@@ -78,11 +97,27 @@ export const HomeSlice = createSlice({
         ,
         setInCallExtNumber(state:StateType,action){
             state.inCallExtNumber = action.payload;
+        },
+        setGlobalError(state:StateType,action){
+            const {visibility,title,message} = action.payload;
+            state.errorDialogVisibility = visibility;
+            state.errorDialogMessage = message??'';
+            state.errorDialogTitle = title??'';
+        }
+        ,
+        setInCallUser(state:StateType,action){
+            state.inCallUser = action.payload;
         }
         
     }
 });
 
-export const { setInCallExtNumber,setInCallStatus,setInCallUsername,setAudioSinkRef,setInCall,setOutGoingUserName, setOutGoingExtNum, setOutgoingDialogVisibilty,setOutgoingCallStatus,setIncomingCallStatus,setIncomingUserName, setIncomingExtNum, setIncomingDialogVisibilty } = HomeSlice.actions;
+export const  startTimer=() => async(dispatch:AppDispatch)=>{
+    dispatch(resetTimer(0));
+    setInterval(()=>{dispatch(setIncreamentTimer(0))},1000);
+}
+
+
+export const {setGlobalError,setIncreamentTimer,resetTimer, setInCallExtNumber,setInCallStatus,setInCallUsername,setAudioSinkRef,setInCall,setOutGoingUserName, setOutGoingExtNum, setInCallUser,setOutgoingDialogVisibilty,setOutgoingCallStatus,setIncomingCallStatus,setIncomingUserName, setIncomingExtNum, setIncomingDialogVisibilty } = HomeSlice.actions;
 
 export default HomeSlice.reducer;

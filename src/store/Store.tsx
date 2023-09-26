@@ -15,10 +15,12 @@ import {
   useSelector as useAppSelector,
   TypedUseSelectorHook,
 } from 'react-redux';
+import AuthReducer from './auth/AuthSlice';
 
 export const store = configureStore({
   
   reducer: {
+    authReducer:AuthReducer,
     homeReducer :HomeReducer,
     customizer: CustomizerReducer,
     ecommerceReducer: EcommerceReducer,
@@ -33,6 +35,7 @@ export const store = configureStore({
 });
 
 const rootReducer = combineReducers({
+  authReducer:AuthReducer,
   homeReducer: HomeReducer,
   customizer: CustomizerReducer,
   ecommerceReducer: EcommerceReducer,

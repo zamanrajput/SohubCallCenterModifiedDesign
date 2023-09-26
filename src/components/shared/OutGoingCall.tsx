@@ -14,6 +14,7 @@ import {
 import { TransitionProps } from "@mui/material/transitions";
 import { useSelector, useDispatch } from "../../store/Store";
 import { setOutGoingExtNum, setOutGoingUserName, setOutgoingDialogVisibilty } from "../../store/home/HomeSlice";
+import { earlyHangUp } from "../../utils/SipDiamond";
 
 
 
@@ -25,6 +26,7 @@ function OutgoingCallDialog() {
 
 
   const onEndClick = ()=>{
+    earlyHangUp();
     dispatch(setOutgoingDialogVisibilty(false))
   }
 

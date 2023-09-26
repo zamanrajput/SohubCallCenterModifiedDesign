@@ -31,13 +31,13 @@ const ProductDetail = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const getTitle: string | any = router.query.id;
-  console.log(getTitle);
+  //(getTitle);
   // Get Product
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
 
-  console.log(getTitle);
+  //(getTitle);
 
   // Get Products
   const product: ProductType | any = useSelector(

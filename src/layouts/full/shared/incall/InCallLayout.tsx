@@ -1,6 +1,16 @@
 import { IconCircle } from "@tabler/icons-react";
 import { useEffect, useState, useRef } from "react";
+import {
 
+  ListItem,
+  ListItemText,
+  ListItemAvatar,
+
+  Stack,
+  Badge,
+  useMediaQuery,
+
+} from "@mui/material";
 import {
   Backspace,
   CallEnd,
@@ -56,8 +66,21 @@ import {
 import { setInCall } from "../../../../store/home/HomeSlice";
 import dayjs from "dayjs";
 import MyTabbedLayout from "../TabbedLayout";
+import { secondsToHHMMSS } from "../../../../utils/utils";
 
 function InCallLayout() {
+
+
+
+
+
+  const callUser = useSelector((state) => state.homeReducer.inCallUser);
+
+
+
+
+
+
   const [isMuted, setIsMuted] = useState(false);
   const [isCallOnHold, setIsCallOnHold] = useState(false);
   const [transferVisible, setTransferVisiblity] = useState(false);
@@ -100,7 +123,7 @@ function InCallLayout() {
   };
 
   function transferCall(type: string, num: string) {
-    console.log(type, num);
+    //(type, num);
     setTransferNum(num);
     if (type === "blind") {
       BlindTransfer(num, {
@@ -178,7 +201,7 @@ function InCallLayout() {
         //do the unhold
       },
       onError: (e: any) => {
-        console.log(e);
+        //(e);
         //can do unhold with warning
       },
     });
@@ -194,7 +217,7 @@ function InCallLayout() {
     conferenceCallMember.session.bye().catch(function (e: any) {
       console.warn("Failed to bye the session!", e);
     });
-    console.log("New call session end");
+    //("New call session end");
     var confCallId = conferenceCallMember.session.data.confcalls.length - 1;
     conferenceCallMember.session.data.confcalls[confCallId].accept.disposition =
       "bye";
@@ -260,349 +283,20 @@ function InCallLayout() {
     dispatch(setInCall(false));
   }
 
+
+
   return (
     <Grid
       container
       sx={{
-        // backgroundColor: "primary.light",
-        backgroundColor: "rgba(144, 238, 144,0.4)",
-        borderRadius: (theme: Theme) => theme.shape.borderRadius / 4,
+        
+        background:'rgba(0,0,0,0.04)',
         p: "20px 20px 20px",
-        marginBottom: "10px",
+        marginBottom: "0",
         position: "relative",
         overflow: "hidden",
       }}
     >
-      {/* <Dialog
-        open={transferVisible}
-        onClose={() => {
-          setTransferVisiblity(false);
-        }}
-      >
-        {transferAdvanceLayout ? (
-          <div className="flex flex-col p-3 w-96 items-center">
-            <p className="font-bold mb-3 w-full">Attended Transfering</p>
-            <Avatar sx={{ width: "120px", height: "120px" }} />
-            <p className="font-semibold text-lg mt-4">{transferNum}</p>
-            <p className="font-bold text-lg mt-2">{transferCallStatus}</p>
-
-            <div className="mt-2 justify-center align-middle flex">
-              <button
-                onClick={completeTransfer}
-                className="btn btn-sm bg-green-600 hover:bg-green-900 text-white rounded-full  text-xs mx-1"
-              >
-                <CallEnd /> Complete
-              </button>
-              <button
-                onClick={() => {
-                  endAttendedTransfer();
-                }}
-                className="btn btn-sm bg-red-600 hover:bg-red-900 text-white rounded-full  text-xs mx-1"
-              >
-                <Close /> Cancel
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="flex flex-col">
-            <div className="flex flex-row justify-between pt-3 px-3">
-              <p
-                style={{
-                  color: "black",
-                  fontWeight: "500",
-                  fontSize: "20px",
-                }}
-              >
-                <div>Call Transfer</div>
-              </p>
-
-              <Close
-                className="cursor-pointer"
-                onClick={() => {
-                  setTransferVisiblity(false);
-                  toggleCallHold();
-                  unholdSession();
-                }}
-                sx={{ justifySelf: "end" }}
-              />
-            </div>
-
-            <div className="pb-6 px-3">
-              <div className="text-center max-w-sm ">
-                <div className="flex w-auto h-12 bg-gray-100 rounded-lg border justify-center mx-2 my-3 text-center items-center">
-                  <h5
-                    style={{ flex: 5 }}
-                    className=" border-none font-bold text-xl"
-
-                  >
-                    {" "}
-                    {dialpadInput}{" "}
-                  </h5>
-                  <span style={{ flex: 1 }}>
-                    {dialpadInput != "" ? (
-                      <div className="bg-red-500 mx-auto justify-center flex hover:bg-red-400 items-center h-9 w-9 rounded-full">
-                        <Backspace
-                          style={{
-                            marginInlineEnd: 3,
-                            width: 20,
-                            height: 20,
-                            color: "white",
-                          }}
-                          onClick={handleRemoveLast}
-                        />
-                      </div>
-                    ) : null}
-                  </span>
-                </div>
-                <div className="w-full flex">
-                  <Switch
-                    onChange={(e) => {
-                      setIsAttendedTransfer(e.target.checked);
-                    }}
-                    checked={isAttendedTransfer}
-                  />{" "}
-                  <span className="self-center ">Attended</span>
-                </div>
-                <hr />
-                <div className="flex flex-wrap mt-3">
-                  <div className="w-1/3">
-                    <button
-                      onClick={() => handleClick("1")}
-                      className="mx-2 rounded-full  w-12 h-12 text-xl text-gray-700 font-bold hover:bg-gray-400"
-                    >
-                      1
-                    </button>
-                  </div>
-                  <div className="w-1/3">
-                    <button
-                      onClick={() => handleClick("2")}
-                      className="mx-2 rounded-full  w-12 h-12 text-xl  text-gray-700 font-bold hover:bg-gray-400"
-                    >
-                      2
-                    </button>
-                  </div>
-                  <div className="w-1/3">
-                    <button
-                      onClick={() => handleClick("3")}
-                      className="mx-2 rounded-full  w-12 h-12 text-xl  text-gray-700 font-bold hover:bg-gray-400"
-                    >
-                      3
-                    </button>
-                  </div>
-                  <div className="w-1/3">
-                    <button
-                      onClick={() => handleClick("4")}
-                      className="mx-2 rounded-full  w-12 h-12 text-xl  text-gray-700 font-bold hover:bg-gray-400"
-                    >
-                      4
-                    </button>
-                  </div>
-                  <div className="w-1/3">
-                    <button
-                      onClick={() => handleClick("5")}
-                      className="mx-2 rounded-full  w-12 h-12 text-xl  text-gray-700 font-bold hover:bg-gray-400"
-                    >
-                      5
-                    </button>
-                  </div>
-                  <div className="w-1/3">
-                    <button
-                      onClick={() => handleClick("6")}
-                      className="mx-2 rounded-full  w-12 h-12  text-xl  text-gray-700 font-bold hover:bg-gray-400"
-                    >
-                      6
-                    </button>
-                  </div>
-                  <div className="w-1/3">
-                    <button
-                      onClick={() => handleClick("7")}
-                      className="mx-2 rounded-full  w-12 h-12 text-xl  text-gray-700 font-bold hover:bg-gray-400"
-                    >
-                      7
-                    </button>
-                  </div>
-                  <div className="w-1/3">
-                    <button
-                      onClick={() => handleClick("8")}
-                      className="mx-2 rounded-full  w-12 h-12  text-xl  text-gray-700 font-bold hover:bg-gray-400"
-                    >
-                      8
-                    </button>
-                  </div>
-                  <div className="w-1/3">
-                    <button
-                      onClick={() => handleClick("9")}
-                      className="mx-2 rounded-full  w-12 h-12  text-xl  text-gray-700 font-bold hover:bg-gray-400"
-                    >
-                      9
-                    </button>
-                  </div>
-                  <div className="w-1/3">
-                    <button
-                      onClick={() => handleClick("*")}
-                      className="mx-2 rounded-full  w-12 h-12 text-xl  text-gray-700 font-bold hover:bg-gray-400"
-                    >
-                      *
-                    </button>
-                  </div>
-                  <div className="w-1/3">
-                    <button
-                      onClick={() => handleClick("0")}
-                      className="mx-2 rounded-full  w-12 h-12  text-xl  text-gray-700 font-bold hover:bg-gray-400"
-                    >
-                      0
-                    </button>
-                  </div>
-                  <div className="w-1/3">
-                    <button
-                      onClick={() => handleClick("#")}
-                      className="mx-2 rounded-full  w-12 h-12  text-xl  text-gray-700 font-bold hover:bg-gray-400"
-                    >
-                      #
-                    </button>
-                  </div>
-                </div>
-                <div className="bg-green-500 mx-auto mt-6 justify-center  flex hover:bg-green-400 items-center h-14 w-14 rounded-full">
-                  <PhoneForwarded
-                    onClick={() => {
-                      transferCall(
-                        isAttendedTransfer ? "attended" : "blind",
-                        dialpadInput
-                      );
-                    }}
-                    className="justify-center align-middle self-center"
-                    sx={{ color: "white" }}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </Dialog>
-      <Dialog open={isDTMFOpen} onClose={() => setDTMFVisibility(false)}>
-        <div className="flex flex-col w-52">
-          <div className="flex flex-row justify-between pt-3 px-3">
-            <p
-              style={{
-                color: "black",
-                fontWeight: "500",
-                fontSize: "20px",
-              }}
-            >
-              <div>DTMF</div>
-            </p>
-
-            <Close
-              className="cursor-pointer"
-              onClick={() => setDTMFVisibility(false)}
-              sx={{ justifySelf: "end" }}
-            />
-          </div>
-
-          <div className="pb-6 px-3">
-            <div className="text-center max-w-sm ">
-              <div className="flex flex-wrap mt-3">
-                <div className="w-1/3">
-                  <button
-                    onClick={() => sendDTMF("1")}
-                    className="mx-2 rounded-full  w-12 h-12 text-xl text-gray-700 font-bold hover:bg-gray-400"
-                  >
-                    1
-                  </button>
-                </div>
-                <div className="w-1/3">
-                  <button
-                    onClick={() => sendDTMF("2")}
-                    className="mx-2 rounded-full  w-12 h-12 text-xl  text-gray-700 font-bold hover:bg-gray-400"
-                  >
-                    2
-                  </button>
-                </div>
-                <div className="w-1/3">
-                  <button
-                    onClick={() => sendDTMF("3")}
-                    className="mx-2 rounded-full  w-12 h-12 text-xl  text-gray-700 font-bold hover:bg-gray-400"
-                  >
-                    3
-                  </button>
-                </div>
-                <div className="w-1/3">
-                  <button
-                    onClick={() => sendDTMF("4")}
-                    className="mx-2 rounded-full  w-12 h-12 text-xl  text-gray-700 font-bold hover:bg-gray-400"
-                  >
-                    4
-                  </button>
-                </div>
-                <div className="w-1/3">
-                  <button
-                    onClick={() => sendDTMF("5")}
-                    className="mx-2 rounded-full  w-12 h-12 text-xl  text-gray-700 font-bold hover:bg-gray-400"
-                  >
-                    5
-                  </button>
-                </div>
-                <div className="w-1/3">
-                  <button
-                    onClick={() => sendDTMF("6")}
-                    className="mx-2 rounded-full  w-12 h-12  text-xl  text-gray-700 font-bold hover:bg-gray-400"
-                  >
-                    6
-                  </button>
-                </div>
-                <div className="w-1/3">
-                  <button
-                    onClick={() => sendDTMF("7")}
-                    className="mx-2 rounded-full  w-12 h-12 text-xl  text-gray-700 font-bold hover:bg-gray-400"
-                  >
-                    7
-                  </button>
-                </div>
-                <div className="w-1/3">
-                  <button
-                    onClick={() => sendDTMF("8")}
-                    className="mx-2 rounded-full  w-12 h-12  text-xl  text-gray-700 font-bold hover:bg-gray-400"
-                  >
-                    8
-                  </button>
-                </div>
-                <div className="w-1/3">
-                  <button
-                    onClick={() => sendDTMF("9")}
-                    className="mx-2 rounded-full  w-12 h-12  text-xl  text-gray-700 font-bold hover:bg-gray-400"
-                  >
-                    9
-                  </button>
-                </div>
-                <div className="w-1/3">
-                  <button
-                    onClick={() => sendDTMF("*")}
-                    className="mx-2 rounded-full  w-12 h-12 text-xl  text-gray-700 font-bold hover:bg-gray-400"
-                  >
-                    *
-                  </button>
-                </div>
-                <div className="w-1/3">
-                  <button
-                    onClick={() => sendDTMF("0")}
-                    className="mx-2 rounded-full  w-12 h-12  text-xl  text-gray-700 font-bold hover:bg-gray-400"
-                  >
-                    0
-                  </button>
-                </div>
-                <div className="w-1/3">
-                  <button
-                    onClick={() => sendDTMF("#")}
-                    className="mx-2 rounded-full  w-12 h-12  text-xl  text-gray-700 font-bold hover:bg-gray-400"
-                  >
-                    #
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </Dialog> */}
 
       <Dialog
         open={transferVisible}
@@ -956,7 +650,7 @@ function InCallLayout() {
                 <hr />
                 <MyTabbedLayout
                   defaultSelection={0}
-                  onSelection={(value: any) => {}}
+                  onSelection={(value: any) => { }}
                   tabs={[
                     {
                       title: <Dialpad />,
@@ -1038,7 +732,7 @@ function InCallLayout() {
                         <div className="flex flex-row h-72 justify-center items-center ">
                           <div className="flex-1 flex w-full h-72 flex-col pt-2 overflow-auto">
                             <div
-                              onClick={() => {}}
+                              onClick={() => { }}
                               className="flex flex-row  mx-2 my-1 hover:bg-blue-200 cursor-pointer "
                               style={{
                                 borderRadius: "6px",
@@ -1125,7 +819,7 @@ function InCallLayout() {
                             </div>
                             {conferenceCallMember !== null ? (
                               <div
-                                onClick={() => {}}
+                                onClick={() => { }}
                                 className="flex flex-row  mx-2 my-1 hover:bg-blue-200 cursor-pointer "
                                 style={{
                                   borderRadius: "6px",
@@ -1215,19 +909,46 @@ function InCallLayout() {
       </Dialog>
 
       <Grid item xs={12} sm={6} lg={8} mb={1}>
-        <Typography variant="h3">{data.inCallUserName}</Typography>
-        <Typography mt={0.8} variant="h4">
-          {data.inCallExtNumber}
-        </Typography>
-        <Typography
-          color="textSecondary"
-          variant="h6"
-          fontWeight={400}
-          mt={1.2}
-          mx={1}
-        >
-          {`Call ${data.inCallStatus}`}
-        </Typography>
+        <ListItem key={100299} dense disableGutters>
+          <ListItemAvatar>
+            <Badge
+              color={
+                "success"
+
+                // getOpponentUser === "online"
+                //   ? "success"
+                //   : chatDetails.status === "busy"
+                //   ? "error"
+                //   : chatDetails.status === "away"
+                //   ? "warning"
+                //   : "secondary"
+              }
+              variant="dot"
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "right",
+              }}
+              overlap="circular"
+            >
+              <Avatar
+                alt={"Profile Picture"}
+                src={callUser?.display_picture}
+                sx={{ width: 60, height: 60 }}
+              />
+            </Badge>
+          </ListItemAvatar>
+          <ListItemText
+          sx={{marginInlineStart:2}}
+            primary={
+              <Typography variant="h5">
+                {callUser?.display_name}
+              </Typography>
+            }
+            secondary={     <Typography variant="subtitle2">
+            {secondsToHHMMSS(data.inCallTimer)}
+          </Typography>}
+          />
+        </ListItem>
       </Grid>
       <Grid item xs={12} sm={6} lg={4} display="flex" alignItems="flex-end">
         <Box
@@ -1240,16 +961,16 @@ function InCallLayout() {
         >
           <Box
             sx={{
-              width: "30%",
+              width: "60%",
               height: "100%",
               top: "0px",
               position: "absolute",
             }}
           >
-            <Container maxWidth="sm" sx={{ paddingTop: "20px", width: "80%" }}>
+            <Container maxWidth="xl" sx={{ paddingTop: "20px", width: "100%" }}>
               <Box>
                 <Grid container spacing={2}>
-                  <Grid item xs={4}>
+                  <Grid item xs={2}>
                     <Button
                       variant="contained"
                       sx={{ height: "40px" }}
@@ -1259,7 +980,7 @@ function InCallLayout() {
                       {isMuted ? <MicOff /> : <Mic />}
                     </Button>
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid item xs={2}>
                     <Button
                       onClick={() => {
                         setTransferVisiblity(true);
@@ -1272,17 +993,8 @@ function InCallLayout() {
                       <CallMade />
                     </Button>
                   </Grid>
-                  <Grid item xs={4}>
-                    <Button
-                      onClick={endCall}
-                      variant="contained"
-                      fullWidth
-                      sx={{ height: "40px", background: "red" }}
-                    >
-                      <CallEnd />
-                    </Button>
-                  </Grid>
-                  <Grid item xs={4}>
+
+                  <Grid item xs={2}>
                     <Button
                       variant="contained"
                       fullWidth
@@ -1292,7 +1004,7 @@ function InCallLayout() {
                       {isCallOnHold ? <Pause /> : <PlayArrow />}
                     </Button>
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid item xs={2}>
                     <Button
                       onClick={() => setDTMFVisibility(true)}
                       variant="contained"
@@ -1302,7 +1014,7 @@ function InCallLayout() {
                       <Keyboard />
                     </Button>
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid item xs={2}>
                     <Button
                       onClick={() => {
                         setConferenceCall(true);
@@ -1313,6 +1025,16 @@ function InCallLayout() {
                       fullWidth
                     >
                       <Group />
+                    </Button>
+                  </Grid>
+                  <Grid item xs={2}>
+                    <Button
+                      onClick={endCall}
+                      variant="contained"
+                      fullWidth
+                      sx={{ height: "40px", background: "red" }}
+                    >
+                      <CallEnd />
                     </Button>
                   </Grid>
                 </Grid>

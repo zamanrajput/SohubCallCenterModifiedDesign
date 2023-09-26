@@ -1,70 +1,154 @@
-import axios from '../../../utils/axios';
-import { createSlice } from '@reduxjs/toolkit';
-import { AppDispatch } from '../../Store';
-import { uniqueId } from 'lodash';
-import { sub } from 'date-fns';
+import axios from "../../../utils/axios";
+import { createSlice } from "@reduxjs/toolkit";
+import { AppDispatch } from "../../Store";
+import { uniqueId } from "lodash";
+import { sub } from "date-fns";
+import dayjs from "dayjs";
+import { sendChatMessage } from "../../../utils/SipDiamond";
+import { socketHook, socketRequest } from "../../../utils/WebSocket";
+import { Chat, ChatMessage } from "../../../types/response_schemas";
+import { getCreds, loadUser } from "../../auth/AuthSlice";
 
-const API_URL = '/api/data/chat/ChatData';
+const API_URL = "/api/data/chat/ChatData";
 
 interface StateType {
-  chats: any[];
-  chatContent: number;
+  chats: Chat[];
+  activeChatIndex: number;
   chatSearch: string;
 }
 
 const initialState = {
   chats: [],
-  chatContent: 1,
-  chatSearch: '',
+  activeChatIndex: 1,
+  chatSearch: "",
 };
 
 export const ChatSlice = createSlice({
-  name: 'chat',
+  name: "chat",
   initialState,
   reducers: {
-    getChats: (state, action) => {
+    setChats: (state, action) => {
       state.chats = action.payload;
+      // //(JSON.stringify(state.chats));
     },
     SearchChat: (state, action) => {
       state.chatSearch = action.payload;
     },
     SelectChat: (state: StateType, action) => {
-      state.chatContent = action.payload;
+      state.activeChatIndex = action.payload;
     },
-    sendMsg: (state: StateType, action) => {
-      const conversation = action.payload;
-      const { id, msg } = conversation;
 
-      const newMessage = {
-        id: id,
-        msg: msg,
-        type: 'text',
-        attachments: [],
-        createdAt: sub(new Date(), { seconds: 1 }),
-        senderId: uniqueId(),
-      };
-
-      state.chats = state.chats.map((chat) =>
-        chat.id === action.payload.id
-          ? {
-              ...chat,
-              ...chat.messages.push(newMessage),
-            }
-          : chat,
-      );
-    },
   },
 });
 
-export const { SearchChat, getChats, sendMsg, SelectChat } = ChatSlice.actions;
+var isFirst = true;
 
-export const fetchChats = () => async (dispatch: AppDispatch) => {
-  try {
-    const response = await axios.get(`${API_URL}`);
-    dispatch(getChats(response.data));
-  } catch (err: any) {
-    throw new Error(err);
+export const registerChatsHook = (id: any) => async (dispatch: AppDispatch) => {
+
+  if (isFirst) {
+    //("XYZ", "Attemping to register hook")
+    socketHook({
+      name: 'messages_hook', onUpdate(data) {
+        dispatch(setChats(data['data'][id]));
+      },
+    })
+    isFirst = false;
   }
-};
+
+
+}
+
+export const sendMsg = (data: any, chats: Chat[]) => async (dispatch: AppDispatch) => {
+  const { chat_id, from_id, to_id, message, attachment, sip_extension } = data;
+
+  const newMessage: ChatMessage = {
+    id: '',
+    chat_id: chat_id,
+    message: message,
+    attachment_url: attachment,
+    from_id: from_id,
+    to_id: to_id,
+    created_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+    updated_at: dayjs().format('YYYY-MM-DDTHH:mm:ss'),
+  };
+
+  socketRequest({
+    data: {
+      route: 'new_message',
+      data: {
+        chat_id: newMessage.chat_id,
+        from_id: newMessage.from_id,
+        to_id: newMessage.to_id,
+        attachment_url: newMessage.attachment_url,
+        message: newMessage.message,
+      },
+    }, onError(error) {
+
+    }, onResponse(response) {
+
+      var chatsNew: Chat[] = [];
+      chats.forEach((x) => {
+        if (x.id == chat_id) {
+          var messages = [...x.messages, newMessage];
+          // messages.push(newMessage);
+          var chat: Chat = {
+            member1: x.member1,
+            member2: x.member2,
+            members: x.members,
+            messages: messages,
+            id: x.id
+          }
+
+          chatsNew.push(chat)
+
+        } else {
+          chatsNew.push(x);
+        }
+      })
+
+      dispatch(setChats(chatsNew));
+    },
+  })
+
+  sendChatMessage({
+    extNum: sip_extension,
+    message: message,
+    onFailed: (reason: any) => {
+      //("Failed to sent:", reason);
+    },
+    onSent: () => {
+      //("message sent");
+    },
+  });
+
+
+}
+
+
+
+export const createNewChat=(from: string, to: string) =>async(dispatch:AppDispatch)=>{
+  socketRequest({
+    data: {
+      route: "new_chat",
+      data: {
+        members: from + "," + to,
+      }
+    }, onError(error) {
+
+    }, onResponse(response) {
+        dispatch(loadUser(getCreds(),()=>{
+          dispatch(SelectChat(0));
+        },()=>{}));
+       
+    },
+  })
+
+}
+
+
+
+export const { SearchChat, setChats, SelectChat } = ChatSlice.actions;
+
+
 
 export default ChatSlice.reducer;

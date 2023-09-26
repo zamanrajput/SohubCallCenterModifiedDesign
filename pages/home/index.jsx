@@ -59,18 +59,18 @@ const Home = () => {
 
   const incomingCallbacks = {
     onStatusChange: function onStatusChange(string) {
-      console.log("incomingCallbacks", "status:" + string);
+      //("incomingCallbacks", "status:" + string);
       setCallStatus(string);
     },
     onEnd: function onEnd() {
-      console.log("incomingCallbacks", "onEnd");
+      //("incomingCallbacks", "onEnd");
       setInCall(false);
       setCallStatus("None");
       setStop(true);
     },
     onSuccess: function onSuccess() {
       //call started now or established now
-      console.log("incomingCallbacks", "Success");
+      //("incomingCallbacks", "Success");
       setCallStatus("Established");
       if (getCounter() === 0) {
         startTimer();
@@ -84,7 +84,7 @@ const Home = () => {
     },
     onCancleInvite: function onCancleInvite() {
       //WORKING FINE
-      console.log("incomingCallbacks", "Invite Cancelled");
+      //("incomingCallbacks", "Invite Cancelled");
       setInComingCall(false);
     },
   };
@@ -92,26 +92,26 @@ const Home = () => {
     onTry: () => {
       setInCall(true);
       setCallStatus("Calling..");
-      console.log("outgoinCallbacks", "onTry");
+      //("outgoinCallbacks", "onTry");
     },
     onRinging: () => {
       setInCall(true);
       setCallStatus("Ringing..");
-      console.log("outgoinCallbacks", "onRinging");
+      //("outgoinCallbacks", "onRinging");
     },
     onAccept: () => {
       setInCall(true);
-      console.log("outgoinCallbacks", "onAccept");
+      //("outgoinCallbacks", "onAccept");
       setCallStatus("Established");
       startTimer();
     },
     onReject: () => {
       setCallStatus("Call Ended");
-      console.log("outgoinCallbacks", "onReject");
+      //("outgoinCallbacks", "onReject");
       clearObjs();
     },
     onEnd: () => {
-      console.log("outgoinCallbacks", "onEnd");
+      //("outgoinCallbacks", "onEnd");
       setCallStatus("Call Ended");
       setStop(true);
       clearObjs();
@@ -120,7 +120,7 @@ const Home = () => {
     onRedirect: () => {
       setInCall(true);
       setCallStatus("Redirecting..");
-      console.log("outgoinCallbacks", "onRedirect");
+      //("outgoinCallbacks", "onRedirect");
     },
     onHang: () => {
       setInCall(false);
@@ -169,7 +169,7 @@ const Home = () => {
   function startTimer() {
     const seconds = getCounter();
     setCounter(seconds + 1);
-    console.log(`${getCounter()}s`);
+    //(`${getCounter()}s`);
     setCallDuration(convertSecondsToHMS(getCounter()));
     const iid = setInterval(() => {
       if (!isStop()) startTimer();
@@ -181,13 +181,13 @@ const Home = () => {
   }
 
   function onRejectClick() {
-    console.log("Rejected by you");
+    //("Rejected by you");
     setInComingCall(false);
     RejectCall();
     clearObjs();
   }
   function onAcceptClick() {
-    console.log("Accepted by you");
+    //("Accepted by you");
     AnswerAudioCall();
     setInComingCall(false);
     setCallerNumber(incomingCallerNumber);

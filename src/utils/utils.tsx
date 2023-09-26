@@ -1,6 +1,10 @@
 
+import { socketBaseUrl } from "../config";
+import User from "../types/auth/User";
+import { Chat } from "../types/response_schemas";
 
-export  function navigateTo(path:string){
+
+export function navigateTo(path: string) {
     window.location.href = path;
 }
 
@@ -9,48 +13,53 @@ export  function navigateTo(path:string){
 export const appName = "Call Center";
 
 
-export   const  appDomain = "";
+export const appDomain = "";
 
-export  const   appLogo = 'path-to-logo'
-
-export interface UserDataType {
-    avatar:string,
-    user_name:string,
-    login_status: string;
-    extension: string;
-    password: string;
-    domain: string;
-    websocket_port: string;
-    websocket_path: string;
-  }
-  
+export const appLogo = 'path-to-logo'
 
 
-export function getUserData():UserDataType{
-    
-    const savedData = localStorage.getItem('saved_data');
-  if (savedData) {
-    return JSON.parse(savedData) as UserDataType;
-  }
-  const response: UserDataType = {
-    user_name:'',
-    avatar:'',
-    login_status: "",
-    extension: "",
-    password: "",
-    domain: "",
-    websocket_port: "",
-    websocket_path: "",
-  };
-  return response;
-  
+
+export function getOpponentUser(chat: Chat, thisUser: string | null | undefined): User {
+    if (chat.member1.id.toString() == thisUser?.toString()) {
+        return chat.member2;
+    } else {
+        return chat.member1;
+    }
 }
 
 
-export function saveData(data:UserDataType){
-    localStorage.setItem('saved_data',JSON.stringify(data));
-    console.log('saved',getUserData());
+export function getChatWithExt(chats: Chat[], thisUser: User, ext: string): Chat | null {
+    for (var i = 0; i < chats.length; i++) {
+        const chat = chats[i];
+        if (getOpponentUser(chat, thisUser.id).sip_extension == ext) {
+            return chat;
+        }
+    };
+    return null;
 }
-export function clearDb(){
-    localStorage.clear();
+export function secondsToHHMMSS(seconds: number): string {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+
+    let timeString = '';
+
+    if (hours > 0) {
+        const formattedHours = hours.toString().padStart(2, '0');
+        timeString += `${formattedHours}:`;
+    }
+
+    const formattedMinutes = minutes.toString().padStart(2, '0');
+    const formattedSeconds = remainingSeconds.toString().padStart(2, '0');
+
+    timeString += `${formattedMinutes}:${formattedSeconds}`;
+
+    return timeString;
+}
+
+
+
+
+export function getFileTypeFromUrl(url: string) {
+    return url.substring(url.lastIndexOf('.'));
 }

@@ -31,7 +31,7 @@ const MakeGetWithAuthCall = (url:string, token:string,  callback:(error:any,resu
   var myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
   var t = "Bearer " + token;
-  console.log("token", t);
+  //("token", t);
   myHeaders.append("Authorization", "Bearer " + token);
 
   fetch(url, {
@@ -41,7 +41,7 @@ const MakeGetWithAuthCall = (url:string, token:string,  callback:(error:any,resu
   })
     .then((response) => {
         if(response.status===401){
-            console.log('status',response.status)
+            //('status',response.status)
             clearDb();
             navigateTo('/auth/login');
             // document.location.reload();

@@ -21,7 +21,7 @@ const VideoPad = () => {
         setShowRightSide(true);
     };
 
-    console.log(darkMode)
+    //(darkMode)
     return (<>
         <div className={darkMode ? 'dark' : ''} style={{
             backgroundColor: 'var(--app-background)', width: '100%', height: '100%', fontFamily: ' "DM Sans", sans-serif',

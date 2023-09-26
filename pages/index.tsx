@@ -4,6 +4,10 @@ import {
   Breadcrumbs,
   Button,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Divider,
   Grid,
   Icon,
@@ -23,6 +27,7 @@ import IncomingCallDialog from "../src/components/shared/IncomingCall";
 import { dispatch, useSelector } from "../src/store/Store";
 import {
   setAudioSinkRef,
+  setGlobalError,
   setInCall,
   setInCallExtNumber,
   setInCallStatus,
@@ -36,6 +41,13 @@ import {
   setOutgoingDialogVisibilty,
 } from "../src/store/home/HomeSlice";
 import InCallLayout from "../src/layouts/full/shared/incall/InCallLayout";
+import { Message } from "sip.js";
+import { getCreds } from "../src/store/auth/AuthSlice";
+import { navigateTo } from "../src/utils/utils";
+import { registerChatsHook } from "../src/store/apps/chat/ChatSlice";
+import { ErrorOutline, Warning } from "@mui/icons-material";
+
+
 
 export default function Modern() {
   const ref = useRef(null);
@@ -48,20 +60,20 @@ export default function Modern() {
 
   const incomingCallbacks = {
     onStatusChange: function onStatusChange(str: string) {
-      console.log("incomingCallbacks", "status:" + str);
+      //("incomingCallbacks", "status:" + str);
       dispatch(setIncomingCallStatus(str));
     },
     onEnd: function onEnd() {
-      console.log("incomingCallbacks", "onEnd");
+      //("incomingCallbacks", "onEnd");
       dispatch(setInCall(false));
       dispatch(setIncomingCallStatus("Ended"));
     },
     onSuccess: function onSuccess() {
       //call started now or established now
-      console.log("incomingCallbacks", "Success");
+      //("incomingCallbacks", "Success");
       dispatch(setIncomingCallStatus("Established"));
 
-  
+
     },
     onInvite: function onInvite(inviterId: string) {
       //working fine
@@ -72,7 +84,7 @@ export default function Modern() {
     },
     onCancleInvite: function onCancleInvite() {
       //WORKING FINE
-      console.log("incomingCallbacks", "Invite Cancelled");
+      //("incomingCallbacks", "Invite Cancelled");
       dispatch(setInCall(false));
     },
   };
@@ -80,15 +92,15 @@ export default function Modern() {
   const outgoingCallbacks = {
     onTry: () => {
       dispatch(setOutgoingCallStatus("Calling..."));
-      console.log("outgoinCallbacks", "onTry");
+      //("outgoinCallbacks", "onTry");
     },
     onRinging: () => {
       dispatch(setOutgoingCallStatus("Ringing..."));
-      console.log("outgoinCallbacks", "onRinging");
+      //("outgoinCallbacks", "onRinging");
     },
     onAccept: () => {
-      console.log(data.outGoingExtNum);
-      console.log("Zaman khuhsh ho ja");
+      //(data.outGoingExtNum);
+      //("Zaman khuhsh ho ja");
       dispatch(setInCallExtNumber(data.outGoingExtNum));
       dispatch(setInCallUsername(data.outGoingUserName));
       dispatch(setInCallStatus("Established"));
@@ -103,15 +115,15 @@ export default function Modern() {
       dispatch(setOutGoingExtNum(""));
       dispatch(setOutGoingUserName(""));
       dispatch(setInCall(false));
-      console.log("outgoinCallbacks", "onReject");
+      //("outgoinCallbacks", "onReject");
     },
     onEnd: () => {
-      console.log("outgoinCallbacks", "onEnd");
+      //("outgoinCallbacks", "onEnd");
 
       dispatch(setOutgoingCallStatus("Call Ended"));
       dispatch(setOutgoingDialogVisibilty(false));
 
-      console.log("XYZ:DATA CLEARED");
+      //("XYZ:DATA CLEARED");
       dispatch(setInCall(false));
       dispatch(setInCallExtNumber(""));
       dispatch(setInCallUsername(""));
@@ -124,7 +136,7 @@ export default function Modern() {
     },
 
     onRedirect: () => {
-      console.log("outgoinCallbacks", "onRedirect");
+      //("outgoinCallbacks", "onRedirect");
       dispatch(setOutgoingCallStatus("Redirecting"));
       dispatch(setOutgoingDialogVisibilty(true));
     },
@@ -144,38 +156,69 @@ export default function Modern() {
   useEffect(() => {
     setLoading(false);
   }, []);
+
+
+
   useEffect(() => {
     CreateUserAgent({
       audioElementRef: ref.current,
       onStatusChange: (status: any) => {
-        console.log(status);
+        //(status);
       },
+      onMessage: (sip: Message) => {
+        //(sip.request.from);
+        //(sip.request.body);
+      }
     });
+
   }, []);
 
-  // function startTimer() {
-  //   const seconds = getCounter();
-  //   setCounter(seconds + 1);
-  //   console.log(`${getCounter()}s`);
-  //   setCallDuration(convertSecondsToHMS(getCounter()));
-  //   const iid = setInterval(() => {
-  //     if (!isStop()) startTimer();
-  //     else {
-  //       setCallDuration(null);
-  //     }
-  //     clearInterval(iid);
-  //   }, 1000);
-  // }
 
   const data = useSelector((state) => state.homeReducer);
+  const creds = useSelector((state) => state.authReducer);
+
+  const id = useSelector((x) => x.authReducer.user?.id);
+
+  //("XYZ", 'id:' + id);
+  if (id != null) {
+    //("XYZ", 'registering for hook');
+    dispatch(
+      registerChatsHook(id));
+  }
+
+  if (getCreds().email == '') {
+    navigateTo('/auth/login')
+  }
+
+
 
   return (
     <PageContainer>
-      {data.inCall ? (
-        <InCallLayout />
-      ) : (
+
+      <Dialog  open={data.errorDialogVisibility} >
+        <DialogTitle sx={{padding:1.5,display:'flex',alignItems:'center',minWidth:'300px'}}>
+          <ErrorOutline color="error" sx={{marginInlineEnd:"10px",color:'red'}} />
+          {data.errorDialogTitle}
+        </DialogTitle>
+
+        <DialogContent sx={{paddingTop:4}}>
+
+          <p className="text-700 text-black">{data.errorDialogMessage}</p>
+
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={()=>dispatch(setGlobalError({visibility:false}))}>
+            OKAY
+          </Button>
+        </DialogActions>
+
+      </Dialog>
+
+
+
+     
         <Breadcrumb title="Sohub Call Center" subtitle="Messenger" />
-      )}
+      
 
       <OutgoingCallDialog />
       <IncomingCallDialog />

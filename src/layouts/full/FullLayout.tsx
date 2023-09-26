@@ -1,12 +1,14 @@
 import { styled, Container, Box, useTheme } from "@mui/material";
-import { useSelector } from "../../store/Store";
+import { dispatch, useSelector } from "../../store/Store";
 import { AppState } from "../../store/Store";
 import Header from "./vertical/header/Header";
 import Sidebar from "./vertical/sidebar/Sidebar";
 import Customizer from "./shared/customizer/Customizer";
 import Navigation from "../full/horizontal/navbar/Navigation";
 import HorizontalHeader from "../full/horizontal/header/Header";
-import { clearDb, getUserData, navigateTo } from "../../utils/utils";
+import {  navigateTo } from "../../utils/utils";
+import { getCreds, loadUser } from "../../store/auth/AuthSlice";
+import { useEffect, useState } from "react";
 
 const MainWrapper = styled("div")(() => ({
   display: "flex",
@@ -32,14 +34,19 @@ interface Props {
 const FullLayout: React.FC<Props> = ({ children }) => {
   const customizer = useSelector((state: AppState) => state.customizer);
   const theme = useTheme();
-  const data = getUserData();
-
-
-    if(data.login_status===''){
-      navigateTo('/auth/login');
-    }
   
 
+
+    if(getCreds().email == ''){
+      navigateTo('/auth/login');
+    }
+
+    const [isFirst,setIsFirst] = useState<boolean>(true);
+  
+    if(isFirst){
+      dispatch(loadUser(getCreds(),()=>{},()=>{}));
+      setIsFirst(false);
+    }
 
   return (
     <MainWrapper>

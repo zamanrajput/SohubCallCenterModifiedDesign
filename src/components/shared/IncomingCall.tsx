@@ -26,14 +26,14 @@ function IncomingCallDialog() {
 
   
   function onRejectClick() {
-    console.log("Rejected by you");
+    //("Rejected by you");
     dispatch(setInCall(false));
     dispatch(setIncomingDialogVisibilty(false));
     dispatch(setOutgoingDialogVisibilty(false));
     RejectCall();
   }
   function onAcceptClick() {
-    console.log("Accepted by you");
+    //("Accepted by you");
     AnswerAudioCall();
     dispatch(setIncomingDialogVisibilty(false));
     dispatch(setOutgoingDialogVisibilty(false));

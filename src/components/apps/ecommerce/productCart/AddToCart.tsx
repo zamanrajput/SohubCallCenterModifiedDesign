@@ -32,7 +32,7 @@ const AddToCart = () => {
   const Cartproduct: ProductType[] = useSelector(
     (state) => state.ecommerceReducer.cart
   );
-  console.log(Cartproduct);
+  //(Cartproduct);
   const Increase = (productId: number | string) => {
     dispatch(increment(productId));
   };

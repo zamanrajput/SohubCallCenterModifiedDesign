@@ -17,6 +17,11 @@ import {
   IconPhoto,
   IconSend,
 } from "@tabler/icons-react";
+
+import { sendChatMessage } from "../../../utils/SipDiamond";
+import { Chat } from "../../../types/response_schemas";
+import User from "../../../types/auth/User";
+import { getOpponentUser } from "../../../utils/utils";
 import { sendMsg } from "../../../store/apps/chat/ChatSlice";
 
 const ChatMsgSent = () => {
@@ -39,19 +44,39 @@ const ChatMsgSent = () => {
     setAnchorEl(null);
   };
 
-  const id = useSelector((state) => state.chatReducer.chatContent);
+  const activeChat:Chat = useSelector((state) => state.chatReducer.chats[state.chatReducer.activeChatIndex]);
+  const thisUser:User|null = useSelector((state) => state.authReducer.user);
+  const allChats:Chat[]  = useSelector((c)=>c.chatReducer.chats);
+
+  var chatOppo :User|null = null;
+  if(activeChat!=null){
+    chatOppo = getOpponentUser(activeChat,thisUser?.id);
+  }
 
   const handleChatMsgChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMsg(e.target.value);
+
   };
 
-  const newMsg = { id, msg };
+
+
+
+
+
+
 
   const onChatMsgSubmit = (e: any) => {
     e.preventDefault();
     e.stopPropagation();
-    dispatch(sendMsg(newMsg));
-    setMsg("");
+
+
+    const newMsg = { chat_id:activeChat.id,from_id:thisUser?.id,to_id:chatOppo?.id,message:msg,attachment:'' };
+
+
+    dispatch(sendMsg(newMsg,allChats));
+    setMsg('');
+
+
   };
 
   return (
@@ -111,10 +136,8 @@ const ChatMsgSent = () => {
         />
         <IconButton
           aria-label="delete"
-          onClick={() => {
-            dispatch(sendMsg(newMsg));
-            setMsg("");
-          }}
+          onClick={
+            onChatMsgSubmit}
           disabled={!msg}
           color="primary"
         >

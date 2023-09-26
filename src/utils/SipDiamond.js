@@ -7,6 +7,7 @@ import {
   SubscriptionState,
   UserAgent,
   Inviter,
+  Messager,
 } from "sip.js";
 
 let AutoDeleteDefault = true; // For automatically created buddies (inbound and outbound), should the buddy be set to AutoDelete.
@@ -165,11 +166,11 @@ export function holdSession() {
   if (lineObj == null || lineObj.SipSession == null) return;
   var session = lineObj.SipSession;
   if (session.isOnHold == true) {
-    console.log("Call is is already on hold:", lineNum);
+    //("Call is is already on hold:", lineNum);
     return;
   }
   var lineNum = lineObj.LineNumber;
-  console.log("Putting Call on hold:", lineNum);
+  //("Putting Call on hold:", lineNum);
   session.isOnHold = true;
 
   var sessionDescriptionHandlerOptions =
@@ -200,14 +201,14 @@ export function holdSession() {
                   session.data.AudioSourceTrack &&
                   session.data.AudioSourceTrack.kind == "audio"
                 ) {
-                  console.log(
-                    "Muting Mixed Audio Track : " +
-                      session.data.AudioSourceTrack.label
-                  );
+                  //(
+                  //   "Muting Mixed Audio Track : " +
+                  //     session.data.AudioSourceTrack.label
+                  // );
                   session.data.AudioSourceTrack.enabled = false;
                 }
               }
-              console.log("Muting Audio Track : " + RTCRtpSender.track.label);
+              //("Muting Audio Track : " + RTCRtpSender.track.label);
               RTCRtpSender.track.enabled = false;
             }
             // Stop Video
@@ -217,7 +218,7 @@ export function holdSession() {
           });
         }
         session.isOnHold = true;
-        console.log("Call is is on hold:", lineNum);
+        //("Call is is on hold:", lineNum);
 
         // //"#line-" + lineNum + "-btn-Hold").hide();
         // //"#line-" + lineNum + "-btn-Unhold").show();
@@ -246,10 +247,10 @@ export function unholdSession() {
   var session = lineObj.SipSession;
   var lineNum = lineObj.LineNumber;
   if (session.isOnHold == false) {
-    console.log("Call is already off hold:", lineNum);
+    //("Call is already off hold:", lineNum);
     return;
   }
-  console.log("Taking call off hold:", lineNum);
+  //("Taking call off hold:", lineNum);
   session.isOnHold = false;
 
   var sessionDescriptionHandlerOptions =
@@ -280,14 +281,14 @@ export function unholdSession() {
                   session.data.AudioSourceTrack &&
                   session.data.AudioSourceTrack.kind == "audio"
                 ) {
-                  console.log(
-                    "Unmuting Mixed Audio Track : " +
-                      session.data.AudioSourceTrack.label
-                  );
+                  //(
+                  //   "Unmuting Mixed Audio Track : " +
+                  //     session.data.AudioSourceTrack.label
+                  // );
                   session.data.AudioSourceTrack.enabled = true;
                 }
               }
-              console.log("Unmuting Audio Track : " + RTCRtpSender.track.label);
+              //("Unmuting Audio Track : " + RTCRtpSender.track.label);
               RTCRtpSender.track.enabled = true;
             } else if (
               RTCRtpSender.track &&
@@ -298,7 +299,7 @@ export function unholdSession() {
           });
         }
         session.isOnHold = false;
-        console.log("Call is off hold:", lineNum);
+        //("Call is off hold:", lineNum);
 
         // //"#line-" + lineNum + "-btn-Hold").show();
         // //"#line-" + lineNum + "-btn-Unhold").hide();
@@ -333,13 +334,13 @@ export function MuteSession() {
           session.data.AudioSourceTrack &&
           session.data.AudioSourceTrack.kind == "audio"
         ) {
-          console.log(
-            "Muting Mixed Audio Track : " + session.data.AudioSourceTrack.label
-          );
+          // //(
+          //   "Muting Mixed Audio Track : " + session.data.AudioSourceTrack.label
+          // );
           session.data.AudioSourceTrack.enabled = false;
         }
       }
-      console.log("Muting Audio Track : " + RTCRtpSender.track.label);
+      //("Muting Audio Track : " + RTCRtpSender.track.label);
       RTCRtpSender.track.enabled = false;
     }
   });
@@ -367,14 +368,11 @@ export function UnmuteSession() {
           session.data.AudioSourceTrack &&
           session.data.AudioSourceTrack.kind == "audio"
         ) {
-          console.log(
-            "Unmuting Mixed Audio Track : " +
-              session.data.AudioSourceTrack.label
-          );
+          //(//   "Unmuting Mixed Audio Track : " +//     session.data.AudioSourceTrack.label // );
           session.data.AudioSourceTrack.enabled = true;
         }
       }
-      console.log("Unmuting Audio Track : " + RTCRtpSender.track.label);
+      //("Unmuting Audio Track : " + RTCRtpSender.track.label);
       RTCRtpSender.track.enabled = true;
     }
   });
@@ -499,7 +497,7 @@ export function ConferenceDial({
   }
 
   // Create new call session
-  console.log("CONFERENCE INVITE: ", "sip:" + dstNo + "@" + domain);
+  //("CONFERENCE INVITE: ", "sip:" + dstNo + "@" + domain);
 
   var targetURI = UserAgent.makeURI(
     "sip:" + dstNo.replace(/#/g, "%23") + "@" + domain
@@ -509,7 +507,7 @@ export function ConferenceDial({
 
   newSession.delegate = {
     onBye: function (sip) {
-      console.log("New call session ended with BYE");
+      //("New call session ended with BYE");
       session.data.confcalls[confCallId].disposition = "bye";
       session.data.confcalls[confCallId].dispositionTime = utcDateNow();
       onEnd();
@@ -534,9 +532,9 @@ export function ConferenceDial({
                 remoteAudio
                   .setSinkId(session.data.AudioOutputDevice)
                   .then(function () {
-                    console.log(
-                      "sinkId applied: " + session.data.AudioOutputDevice
-                    );
+                    //(
+                    //   "sinkId applied: " + session.data.AudioOutputDevice
+                    // );
                   })
                   .catch(function (e) {
                     console.warn("Error using setSinkId: ", e);
@@ -609,7 +607,7 @@ export function ConferenceDial({
         onRinging();
       },
       onRedirect: function (sip) {
-        console.log("Redirect received:", sip);
+        //("Redirect received:", sip);
 
         onRedirect();
       },
@@ -622,7 +620,7 @@ export function ConferenceDial({
         onData(session, dstNo);
       },
       onReject: function (sip) {
-        console.log("New call session rejected: ", sip.message.reasonPhrase);
+        //("New call session rejected: ", sip.message.reasonPhrase);
 
         session.data.confcalls[confCallId].disposition =
           sip.message.reasonPhrase;
@@ -640,7 +638,7 @@ export function ConferenceDial({
 export function changeMicrophone(newid) {
   if (lineObj) var session = lineObj.SipSession;
 
-  console.log("Call to change Microphone: ", newid);
+  //("Call to change Microphone: ", newid);
 
   // Save Setting
   session.data.AudioSourceDevice = newid;
@@ -659,12 +657,12 @@ export function changeMicrophone(newid) {
       var pc = session.sessionDescriptionHandler.peerConnection;
       pc.getSenders().forEach(function (RTCRtpSender) {
         if (RTCRtpSender.track && RTCRtpSender.track.kind == "audio") {
-          console.log(
-            "Switching Audio Track : " +
-              RTCRtpSender.track.label +
-              " to " +
-              newMediaTrack.label
-          );
+          //(
+          //   "Switching Audio Track : " +
+          //     RTCRtpSender.track.label +
+          //     " to " +
+          //     newMediaTrack.label
+          // );
           RTCRtpSender.track.stop(); // Must stop, or this mic will stay in use
           RTCRtpSender.replaceTrack(newMediaTrack)
             .then(function () {})
@@ -682,20 +680,20 @@ export function changeMicrophone(newid) {
 export function changeSpeaker(newid) {
   if (lineObj) var session = lineObj.SipSession;
 
-  console.log("Call to change Speaker: ", newid);
+  //("Call to change Speaker: ", newid);
 
   session.data.AudioOutputDevice = newid;
 
   // Also change the sinkId
   // ======================
   var sinkId = newid;
-  console.log(
-    "Attempting to set Audio Output SinkID for line " +
-      lineObj.LineNumber +
-      " [" +
-      sinkId +
-      "]"
-  );
+  //(
+  //   "Attempting to set Audio Output SinkID for line " +
+  //     lineObj.LineNumber +
+  //     " [" +
+  //     sinkId +
+  //     "]"
+  // );
 
   // Remote Audio
 
@@ -704,7 +702,7 @@ export function changeSpeaker(newid) {
       remoteAudio
         .setSinkId(sinkId)
         .then(function () {
-          console.log("sinkId applied: " + sinkId);
+          //("sinkId applied: " + sinkId);
         })
         .catch(function (e) {
           console.warn("Error using setSinkId: ", e);
@@ -736,7 +734,7 @@ export function mergeConferenceCalls() {
   // Get conf call input channel
   confPc.getReceivers().forEach(function (RTCRtpReceiver) {
     if (RTCRtpReceiver.track && RTCRtpReceiver.track.kind == "audio") {
-      console.log("Adding conference session:", RTCRtpReceiver.track.label);
+      //("Adding conference session:", RTCRtpReceiver.track.label);
       outputStreamForSession.addTrack(RTCRtpReceiver.track);
     }
   });
@@ -744,7 +742,7 @@ export function mergeConferenceCalls() {
   // Get session input channel
   pc.getReceivers().forEach(function (RTCRtpReceiver) {
     if (RTCRtpReceiver.track && RTCRtpReceiver.track.kind == "audio") {
-      console.log("Adding conference session:", RTCRtpReceiver.track.label);
+      //("Adding conference session:", RTCRtpReceiver.track.label);
       outputStreamForConfSession.addTrack(RTCRtpReceiver.track);
     }
   });
@@ -752,7 +750,7 @@ export function mergeConferenceCalls() {
   // Replace tracks of Parent Call
   pc.getSenders().forEach(function (RTCRtpSender) {
     if (RTCRtpSender.track && RTCRtpSender.track.kind == "audio") {
-      console.log("Switching to mixed Audio track on session");
+      //("Switching to mixed Audio track on session");
 
       session.data.AudioSourceTrack = RTCRtpSender.track;
       outputStreamForSession.addTrack(RTCRtpSender.track);
@@ -767,7 +765,7 @@ export function mergeConferenceCalls() {
   // Replace tracks of Child Call
   confPc.getSenders().forEach(function (RTCRtpSender) {
     if (RTCRtpSender.track && RTCRtpSender.track.kind == "audio") {
-      console.log("Switching to mixed Audio track on conf call");
+      //("Switching to mixed Audio track on conf call");
 
       session.data.childsession.data.AudioSourceTrack = RTCRtpSender.track;
       outputStreamForConfSession.addTrack(RTCRtpSender.track);
@@ -780,7 +778,7 @@ export function mergeConferenceCalls() {
     }
   });
 
-  console.log("Conference Call In Progress");
+  //("Conference Call In Progress");
   session.data.confcalls[confCallId].accept.complete = true;
   session.data.confcalls[confCallId].accept.disposition = "join";
   session.data.confcalls[confCallId].accept.eventTime = utcDateNow();
@@ -791,7 +789,7 @@ export function forceEnd() {
   lineObj.SipSession.data.reasonCode = 0;
   lineObj.SipSession.data.reasonText = "Call Cancelled";
 
-  console.log("Cancelling session : " + lineNum);
+  //("Cancelling session : " + lineNum);
   if (
     lineObj.SipSession.state == SessionState.Initial ||
     lineObj.SipSession.state == SessionState.Establishing
@@ -802,7 +800,7 @@ export function forceEnd() {
       "Session not in correct state for cancel.",
       lineObj.SipSession.state
     );
-    console.log("Attempting teardown : " + lineNum);
+    //("Attempting teardown : " + lineNum);
     teardownSession(lineObj);
   }
 }
@@ -810,10 +808,10 @@ export function forceEnd() {
 export function CancelTransferSession({ onDone, onError }) {
   var session = lineObj.SipSession;
   if (session.data.childsession) {
-    console.log(
-      "Child Transfer call detected:",
-      session.data.childsession.state
-    );
+    //(
+    //   "Child Transfer call detected:",
+    //   session.data.childsession.state
+    // );
     session.data.childsession
       .dispose()
       .then(function () {
@@ -828,16 +826,86 @@ export function CancelTransferSession({ onDone, onError }) {
   }
 }
 
+export function sendChatMessage({extNum,message,onSent,onFailed}) {
+  //('Called');
+  if (userAgent == null) return;
+  if (!userAgent.isRegistered()) return;
+
+  // $("#contact-" + buddy + "-ChatMessage").focus(); // refocus on the textarea
+
+  // var message = $("#contact-" + buddy + "-ChatMessage").val();
+
+
+  
+  // Note: AMI has this limit, but only if you use AMI to transmit
+  // if(message.length > 755){
+  //     Alert("Asterisk has a limit on the message size (755). This message is too long, and cannot be delivered.", "Message Too Long");
+
+
+  var messageId = uID();
+
+  // // Add New Message
+  // var newMessageJson = {
+  //   ItemId: messageId,
+  //   ItemType: "MSG",
+  //   ItemDate: DateTime,
+  //   SrcUserId: profileUserID,
+  //   Src: '"' + profileName + '"',
+  //   DstUserId: buddyObj.identity,
+  //   Dst: "",
+  //   MessageData: message,
+  // };
+
+  //update db
+
+  var chatBuddy = UserAgent.makeURI(
+    "sip:" + extNum+ "@" + domain
+  );
+  //("MESSAGE: " + chatBuddy + " (extension)");
+
+  var MessagerMessageOptions = {
+    requestDelegate: {
+      onAccept: function (sip) {
+        //("Message Accepted:", messageId);
+        onSent();
+        // MarkMessageSent(buddyObj, messageId, true);
+      },
+      onReject: function (sip) {
+        onFailed(sip.message.reasonPhrase);
+        console.warn("Message Error", sip.message.reasonPhrase);
+        // MarkMessageNotSent(buddyObj, messageId, true);
+      },
+    },
+    requestOptions: {
+      extraHeaders: [],
+    },
+  };
+  var messageObj = new Messager(
+    userAgent,
+    chatBuddy,
+    message,
+    "text/plain"
+  );
+  messageObj.message(MessagerMessageOptions).then(function () {
+    //(messageObj);
+  });
+   
+
+
+}
+
+
+
 export function clearObjs() {
   lineObj = null;
   inCall = false;
 }
 
 export function endSession() {
-  console.log("endSession Called");
+  //("endSession Called");
 
   var lineNum = lineObj.LineNumber;
-  console.log("Ending call with: " + lineNum);
+  //("Ending call with: " + lineNum);
   lineObj.SipSession.data.terminateby = "us";
   lineObj.SipSession.data.reasonCode = 16;
   lineObj.SipSession.data.reasonText = "Normal Call clearing";
@@ -862,13 +930,13 @@ export function sendDTMF(itemStr) {
       if (
         lineObj.SipSession.data.childsession.state == SessionState.Established
       ) {
-        console.log(
-          "Sending DTMF (" +
-            itemStr +
-            "): " +
-            lineObj.LineNumber +
-            " child session"
-        );
+        //(
+        //   "Sending DTMF (" +
+        //     itemStr +
+        //     "): " +
+        //     lineObj.LineNumber +
+        //     " child session"
+        // );
 
         var result =
           lineObj.SipSession.data.childsession.sessionDescriptionHandler.sendDtmf(
@@ -876,9 +944,9 @@ export function sendDTMF(itemStr) {
             options
           );
         if (result) {
-          console.log("Sent DTMF (" + itemStr + ") child session");
+          //("Sent DTMF (" + itemStr + ") child session");
         } else {
-          console.log("Failed to send DTMF (" + itemStr + ") child session");
+          //("Failed to send DTMF (" + itemStr + ") child session");
         }
       } else {
         console.warn(
@@ -903,16 +971,16 @@ export function sendDTMF(itemStr) {
       lineObj.SipSession.state == SessionState.Established ||
       lineObj.SipSession.state == SessionState.Establishing
     ) {
-      console.log("Sending DTMF (" + itemStr + "): " + lineObj.LineNumber);
+      //("Sending DTMF (" + itemStr + "): " + lineObj.LineNumber);
 
       var res = lineObj.SipSession.sessionDescriptionHandler.sendDtmf(
         itemStr,
         options
       );
       if (res) {
-        console.log("Sent DTMF (" + itemStr + ")");
+        //("Sent DTMF (" + itemStr + ")");
       } else {
-        console.log("Failed to send DTMF (" + itemStr + ")");
+        //("Failed to send DTMF (" + itemStr + ")");
       }
     } else {
       console.warn(
@@ -927,11 +995,11 @@ export function sendDTMF(itemStr) {
 }
 
 var OnStatusChange;
-export function CreateUserAgent({ audioElementRef, onStatusChange }) {
+export function CreateUserAgent({ audioElementRef, onStatusChange ,onMessage}) {
   PreloadAudioFiles();
   remoteAudio = audioElementRef;
   OnStatusChange = onStatusChange;
-  console.log("Creating User Agent...");
+  //("Creating User Agent...");
   OnStatusChange("Connecting With Server");
 
   profileUserID = username;
@@ -974,7 +1042,9 @@ export function CreateUserAgent({ audioElementRef, onStatusChange }) {
       onInvite: function (sip) {
         ReceiveCall(sip);
       },
-      onMessage: function () {
+      onMessage: function (message) {
+        message.accept();
+        onMessage(message);
         // ReceiveOutOfDialogMessage(sip);
       },
     },
@@ -993,14 +1063,14 @@ export function CreateUserAgent({ audioElementRef, onStatusChange }) {
     try {
       options.contactParams = JSON.parse(RegisterContactParams);
     } catch (e) {
-      console.log(e);
+      //(e);
     }
   }
   if (WssInTransport) {
     try {
       options.contactParams.transport = "wss";
     } catch (e) {
-      console.log(e);
+      //(e);
     }
   }
 
@@ -1026,7 +1096,7 @@ export function CreateUserAgent({ audioElementRef, onStatusChange }) {
   userAgent.BlfSubs = [];
   userAgent.lastVoicemailCount = 0;
 
-  console.log("Creating User Agent... Done");
+  //("Creating User Agent... Done");
   onStatusChange("Connected to Server.");
   userAgent.transport.onConnect = function () {
     onTransportConnected();
@@ -1059,7 +1129,7 @@ export function CreateUserAgent({ audioElementRef, onStatusChange }) {
         }
       }
     } catch (e) {
-      console.log(e);
+      //(e);
     }
   }
 
@@ -1079,16 +1149,16 @@ export function CreateUserAgent({ audioElementRef, onStatusChange }) {
         }
       }
     } catch (e) {
-      console.log(e);
+      //(e);
     }
   }
 
   userAgent.registerer = new Registerer(userAgent, RegistererOptions);
-  console.log("Creating Registerer... Done");
+  //("Creating Registerer... Done");
   onStatusChange("Registering with Server");
 
   userAgent.registerer.stateChange.addListener(function (newState) {
-    console.log("User Agent Registration State:", newState);
+    //("User Agent Registration State:", newState);
     switch (newState) {
       case RegistererState.Initial:
         // Nothing to do
@@ -1110,7 +1180,7 @@ export function CreateUserAgent({ audioElementRef, onStatusChange }) {
     }
   });
 
-  console.log("User Agent Connecting to WebSocket...");
+  //("User Agent Connecting to WebSocket...");
 
   userAgent.start().catch(function (error) {
     onTransportConnectError(error);
@@ -1122,7 +1192,7 @@ export function CreateUserAgent({ audioElementRef, onStatusChange }) {
  * @param {string} cause Cause message. Unused
  **/
 function onRegisterFailed(response, cause) {
-  console.log("Registration Failed: " + response);
+  //("Registration Failed: " + response);
   userAgent.registering = false;
 }
 function Register() {
@@ -1138,7 +1208,7 @@ function Register() {
     },
   };
 
-  console.log("Sending Registration...");
+  //("Sending Registration...");
 
   userAgent.registering = true;
   userAgent.registerer.register(RegistererRegisterOptions);
@@ -1147,7 +1217,7 @@ function Register() {
 // Transport Events
 // ================
 function onTransportConnected() {
-  console.log("Connected to Web Socket!");
+  //("Connected to Web Socket!");
 
   // Reset the ReconnectionAttempts
   userAgent.isReRegister = false;
@@ -1176,7 +1246,7 @@ function onTransportConnectError(error) {
 
   // If there is an issue with the WS connection
   // We unregister, so that we register again once its up
-  console.log("Unregister...");
+  //("Unregister...");
   try {
     userAgent.registerer.unregister();
   } catch (e) {
@@ -1186,7 +1256,7 @@ function onTransportConnectError(error) {
   ReconnectTransport();
 }
 function onTransportDisconnected() {
-  console.log("Disconnected from Web Socket!");
+  //("Disconnected from Web Socket!");
 
   userAgent.isReRegister = false;
 }
@@ -1200,10 +1270,10 @@ function ReconnectTransport() {
     onTransportConnected();
     return;
   }
-  console.log("Reconnect Transport...");
+  //("Reconnect Transport...");
 
   window.setTimeout(function () {
-    console.log("ReConnecting to WebSocket...");
+    //("ReConnecting to WebSocket...");
 
     if (userAgent.transport && userAgent.transport.isConnected()) {
       // Already Connected
@@ -1219,12 +1289,12 @@ function ReconnectTransport() {
       });
     }
   }, TransportReconnectionTimeout * 1000);
-  console.log(
-    "Waiting to Re-connect...",
-    TransportReconnectionTimeout,
-    "Attempt remaining",
-    userAgent.transport.ReconnectionAttempts
-  );
+  // //(
+  //   "Waiting to Re-connect...",
+  //   TransportReconnectionTimeout,
+  //   "Attempt remaining",
+  //   userAgent.transport.ReconnectionAttempts
+  // );
   userAgent.transport.ReconnectionAttempts =
     userAgent.transport.ReconnectionAttempts - 1;
 }
@@ -1247,9 +1317,9 @@ function SubscribeAll() {
   }
   userAgent.BlfSubs = [];
   if (Buddies.length >= 1) {
-    console.log(
-      "Starting Subscribe of all (" + Buddies.length + ") Extension Buddies..."
-    );
+    // //(
+    //   "Starting Subscribe of all (" + Buddies.length + ") Extension Buddies..."
+    // );
     for (var b = 0; b < Buddies.length; b++) {
       SubscribeBuddy(Buddies[b]);
     }
@@ -1260,7 +1330,7 @@ function SubscribeAll() {
  */
 function onUnregistered() {
   if (userAgent.registrationCompleted) {
-    console.log("Unregistered, bye!");
+    //("Unregistered, bye!");
   } else {
     // Was never really registered, so cant really say unregistered
   }
@@ -1272,7 +1342,7 @@ function SelfSubscribe() {
   if (!userAgent.isRegistered()) return;
 
   if (userAgent.selfSub) {
-    console.log("Unsubscribe from old self subscribe...");
+    //("Unsubscribe from old self subscribe...");
     SelfUnsubscribe();
   }
 
@@ -1294,7 +1364,7 @@ function SelfSubscribe() {
       // ReceiveNotify(sip, true);
     },
   };
-  console.log("SUBSCRIBE Self: " + username + "@" + domain);
+  //("SUBSCRIBE Self: " + username + "@" + domain);
   userAgent.selfSub.subscribe().catch(function (error) {
     console.warn("Error subscribing to yourself:", error);
   });
@@ -1304,7 +1374,7 @@ function SubscribeVoicemail() {
   if (!userAgent.isRegistered()) return;
 
   if (userAgent.voicemailSub) {
-    console.log("Unsubscribe from old voicemail Messages...");
+    //("Unsubscribe from old voicemail Messages...");
     UnsubscribeVoicemail();
   }
 
@@ -1321,7 +1391,7 @@ function SubscribeVoicemail() {
       // VoicemailNotify(sip);
     },
   };
-  console.log("SUBSCRIBE VOICEMAIL: " + username + "@" + domain);
+  //("SUBSCRIBE VOICEMAIL: " + username + "@" + domain);
   userAgent.voicemailSub.subscribe().catch(function (error) {
     console.warn("Error subscribing to voicemail notifications:", error);
   });
@@ -1356,7 +1426,7 @@ function SubscribeBuddy(buddyObj) {
         // ReceiveNotify(sip, false);
       },
     };
-    console.log("SUBSCRIBE: " + buddyObj.SubscribeUser + "@" + domain);
+    //("SUBSCRIBE: " + buddyObj.SubscribeUser + "@" + domain);
     blfSubscribe.subscribe().catch(function (error) {
       console.warn("Error subscribing to Buddy notifications:", error);
     });
@@ -1369,13 +1439,13 @@ function SubscribeBuddy(buddyObj) {
 function UnsubscribeAll() {
   if (!userAgent.isRegistered()) return;
 
-  console.log("Unsubscribe from voicemail Messages...");
+  //("Unsubscribe from voicemail Messages...");
   UnsubscribeVoicemail();
 
   if (userAgent.BlfSubs && userAgent.BlfSubs.length > 0) {
-    console.log(
-      "Unsubscribing " + userAgent.BlfSubs.length + " subscriptions..."
-    );
+    //(
+    //   "Unsubscribing " + userAgent.BlfSubs.length + " subscriptions..."
+    // );
     for (var blf = 0; blf < userAgent.BlfSubs.length; blf++) {
       UnsubscribeBlf(userAgent.BlfSubs[blf]);
     }
@@ -1406,16 +1476,16 @@ function UnsubscribeBlf(blfSubscribe) {
   if (!userAgent.isRegistered()) return;
 
   if (blfSubscribe.state == SubscriptionState.Subscribed) {
-    console.log("Unsubscribe to BLF Messages...", blfSubscribe.data.buddyId);
+    //("Unsubscribe to BLF Messages...", blfSubscribe.data.buddyId);
     blfSubscribe.unsubscribe().catch(function (error) {
       console.warn("Error removing BLF notifications:", error);
     });
   } else {
-    console.log(
-      "Incorrect buddy subscribe state",
-      blfSubscribe.data.buddyId,
-      blfSubscribe.state
-    );
+    //(
+    //   "Incorrect buddy subscribe state",
+    //   blfSubscribe.data.buddyId,
+    //   blfSubscribe.state
+    // );
   }
   blfSubscribe.dispose().catch(function (error) {
     console.warn("Error disposing BLF notifications:", error);
@@ -1426,10 +1496,10 @@ function UnsubscribeVoicemail() {
   if (!userAgent.isRegistered()) return;
 
   if (userAgent.voicemailSub) {
-    console.log(
-      "Unsubscribe to voicemail Messages...",
-      userAgent.voicemailSub.state
-    );
+    //(
+    //   "Unsubscribe to voicemail Messages...",
+    //   userAgent.voicemailSub.state
+    // );
     if (userAgent.voicemailSub.state == SubscriptionState.Subscribed) {
       userAgent.voicemailSub.unsubscribe().catch(function (error) {
         console.warn("Error removing voicemail notifications:", error);
@@ -1439,7 +1509,7 @@ function UnsubscribeVoicemail() {
       console.warn("Error disposing voicemail notifications:", error);
     });
   } else {
-    console.log("Not subscribed to MWI");
+    //("Not subscribed to MWI");
   }
   userAgent.voicemailSub = null;
 }
@@ -1447,7 +1517,7 @@ function SelfUnsubscribe() {
   if (!userAgent.isRegistered()) return;
 
   if (userAgent.selfSub) {
-    console.log("Unsubscribe from yourself...", userAgent.selfSub.state);
+    //("Unsubscribe from yourself...", userAgent.selfSub.state);
     if (userAgent.selfSub.state == SubscriptionState.Subscribed) {
       userAgent.selfSub.unsubscribe().catch(function (error) {
         console.warn("Error self subscription:", error);
@@ -1457,7 +1527,7 @@ function SelfUnsubscribe() {
       console.warn("Error disposing self subscription:", error);
     });
   } else {
-    console.log("Not subscribed to Yourself");
+    //("Not subscribed to Yourself");
   }
   userAgent.selfSub = null;
 }
@@ -1473,9 +1543,9 @@ var remoteAudio = null;
  */
 export function DialByLine({ type, num, name,callBacks }) {
   
-  console.log("audio element:" + remoteAudio == null);
+  //("audio element:" + remoteAudio == null);
   if (userAgent == null) {
-    console.log("User is not Registered");
+    //("User is not Registered");
     return;
   }
   var numDial = num;
@@ -1576,7 +1646,7 @@ var Buddy = function (
 
 export function earlyHangUp() {
   if(lineObj==null) return;
-  if(lineObj.se)
+
   lineObj.SipSession.cancel();
 }
 
@@ -1643,7 +1713,7 @@ function AudioCall(lineObj, dialledNumber, extraHeaders, outgoingCallbacks) {
   //starting
 
   // Invite
-  console.log("INVITE (audio): " + dialledNumber + "@" + domain);
+  //("INVITE (audio): " + dialledNumber + "@" + domain);
 
   var targetURI = UserAgent.makeURI(
     "sip:" + dialledNumber.replace(/#/g, "%23") + "@" + domain
@@ -1831,7 +1901,7 @@ function VideoCall(lineObj, dialledNumber, extraHeaders) {
   var startTime = moment.utc();
 
   // Invite
-  console.log("INVITE (video): " + dialledNumber + "@" + domain);
+  //("INVITE (video): " + dialledNumber + "@" + domain);
 
   var targetURI = UserAgent.makeURI(
     "sip:" + dialledNumber.replace(/#/g, "%23") + "@" + domain
@@ -2122,7 +2192,7 @@ function onRegistered() {
 
   userAgent.registrationCompleted = true;
   if (!userAgent.isReRegister) {
-    console.log("Registered!");
+    //("Registered!");
 
     // Start Subscribe Loop
     window.setTimeout(function () {
@@ -2139,7 +2209,7 @@ function onRegistered() {
   } else {
     userAgent.registering = false;
 
-    console.log("ReRegistered!");
+    //("ReRegistered!");
   }
   userAgent.isReRegister = true;
 }
@@ -2178,14 +2248,14 @@ function onInviteCancel(lineObj, response) {
   lineObj.SipSession.data.reasonCode = temp_cause;
   if (temp_cause == 0) {
     lineObj.SipSession.data.reasonText = "Call Cancelled";
-    console.log("Call canceled by remote party before answer");
+    //("Call canceled by remote party before answer");
   } else {
     lineObj.SipSession.data.reasonText = "Call completed elsewhere";
-    console.log("Call completed elsewhere before answer");
+    //("Call completed elsewhere before answer");
   }
 
   lineObj.SipSession.dispose().catch(function (error) {
-    console.log("Failed to dispose the cancel dialog", error);
+    //("Failed to dispose the cancel dialog", error);
   });
 
   teardownSession(lineObj);
@@ -2229,10 +2299,10 @@ function onInviteAccepted(lineObj, includeVideo, response) {
           if (!parameters.encodings) parameters.encodings = [{}];
           parameters.encodings[0].maxBitrate = MaxVideoBandwidth * 1000;
 
-          console.log(
-            "Applying limit for Bandwidth to: ",
-            MaxVideoBandwidth + "kb per second"
-          );
+          //(
+          //   "Applying limit for Bandwidth to: ",
+          //   MaxVideoBandwidth + "kb per second"
+          // );
 
           // Only going to try without re-negotiations
           sender.setParameters(parameters).catch(function (e) {
@@ -2314,7 +2384,7 @@ function onInviteAccepted(lineObj, includeVideo, response) {
 }
 // Outgoing INVITE
 function onInviteTrying(lineObj, response) {
-  console.log("onInviteTrying");
+  //("onInviteTrying");
 }
 var hostingPrefix = "./";
 
@@ -2390,17 +2460,17 @@ function PreloadAudioFiles() {
 
   Promise.all(promises).then(() => {
     // All data has been fetched and processed
-    console.log("Audio blobs fetched and processed:", audioBlobs);
+    //("Audio blobs fetched and processed:", audioBlobs);
   });
 }
 function onInviteProgress(lineObj, response) {
-  console.log("Call Progress:", response.message.statusCode);
+  //("Call Progress:", response.message.statusCode);
 
   // Provisional 1xx
   // response.message.reasonPhrase
   if (response.message.statusCode == 180) {
     // //"#line-" + lineObj.LineNumber + "-msg").html(lang.ringing);
-    console.log("Ringing...");
+    //("Ringing...");
 
     var soundFile = audioBlobs.EarlyMedia_European;
     soundFile = audioBlobs.EarlyMedia_US;
@@ -2411,12 +2481,12 @@ function onInviteProgress(lineObj, response) {
     //   soundFile = audioBlobs.EarlyMedia_Japan;
 
     // Play Early Media
-    console.log("Audio:", soundFile.url);
+    //("Audio:", soundFile.url);
     if (lineObj.SipSession.data.earlyMedia) {
       // There is already early media playing
       // onProgress can be called multiple times
       // Don't add it again
-      console.log("Early Media already playing");
+      //("Early Media already playing");
     } else {
       var earlyMedia = new Audio(soundFile.blob);
       earlyMedia.preload = "auto";
@@ -2429,7 +2499,7 @@ function onInviteProgress(lineObj, response) {
           earlyMedia
             .setSinkId(getAudioOutputID())
             .then(function () {
-              console.log("Set sinkId to:", getAudioOutputID());
+              //("Set sinkId to:", getAudioOutputID());
             })
             .catch(function (e) {
               console.warn("Failed not apply setSinkId.", e);
@@ -2452,7 +2522,7 @@ function onInviteProgress(lineObj, response) {
     // );
 
     //   response.message.reasonPhrase + "..."
-    console.log(response.message.reasonPhrase + "...");
+    //(response.message.reasonPhrase + "...");
 
     // // Add UI to allow DTMF
     // //"#line-" + lineObj.LineNumber + "-early-dtmf").show();
@@ -2464,11 +2534,11 @@ function onInviteProgress(lineObj, response) {
     // //"#line-" + lineObj.LineNumber + "-msg").html(
     //   response.message.reasonPhrase + "..."
     // );
-    console.log(response.message.reasonPhrase + "...");
+    //(response.message.reasonPhrase + "...");
   }
 }
 function onInviteRejected(lineObj, response) {
-  console.log("INVITE Rejected:", response.message.reasonPhrase);
+  //("INVITE Rejected:", response.message.reasonPhrase);
 
   lineObj.SipSession.data.terminateby = "them";
   lineObj.SipSession.data.reasonCode = response.message.statusCode;
@@ -2477,7 +2547,7 @@ function onInviteRejected(lineObj, response) {
   teardownSession(lineObj);
 }
 function onInviteRedirected(response) {
-  console.log("onInviteRedirected", response);
+  //("onInviteRedirected", response);
   // Follow???
 }
 
@@ -2492,7 +2562,7 @@ function teardownSession(lineObj) {
   // Call UI
   if (session.data.earlyReject != true) {
     // HidePopup();
-    console.log("Early Rejected");
+    //("Early Rejected");
   }
 
   // End any child calls
@@ -2569,7 +2639,7 @@ function teardownSession(lineObj) {
   if (session.data.calldirection == "inbound") {
     if (session.data.earlyReject) {
       // IncreaseMissedBadge(session.data.buddyId);
-      console.log("Missed call from " + session.data.buddyId);
+      //("Missed call from " + session.data.buddyId);
     } else if (
       session.data.terminateby == "them" &&
       session.data.startTime == null
@@ -2578,7 +2648,7 @@ function teardownSession(lineObj) {
       if (session.data.reasonCode == 0) {
         // Call was canceled, and not answered elsewhere
         // IncreaseMissedBadge(session.data.buddyId);
-        console.log("Not Answered, terminated by them");
+        //("Not Answered, terminated by them");
       }
     }
   }
@@ -2605,10 +2675,10 @@ function ReceiveCall(session) {
   var did = session.remoteIdentity.uri.user;
   if (typeof callerID === "undefined") callerID = did;
 
-  console.log("New Incoming Call!", callerID + " <" + did + ">");
+  //("New Incoming Call!", callerID + " <" + did + ">");
 
   var CurrentCalls = countSessions(session.id);
-  console.log("Current Call Count:", CurrentCalls);
+  //("Current Call Count:", CurrentCalls);
 
   var buddyObj = FindBuddyByDid(did);
   // Make new contact of its not there
@@ -2702,9 +2772,9 @@ function ReceiveCall(session) {
   // if (DoNotDisturbEnabled == true || DoNotDisturbPolicy == "enabled") {
   //   if (DoNotDisturbEnabled == true && buddyObj.EnableDuringDnd == true) {
   //     // This buddy has been allowed
-  //     console.log("Buddy is allowed to call while you are on DND");
+  //     //("Buddy is allowed to call while you are on DND");
   //   } else {
-  //     console.log("Do Not Disturb Enabled, rejecting call.");
+  //     //("Do Not Disturb Enabled, rejecting call.");
   //     lineObj.SipSession.data.earlyReject = true;
   //     RejectCall(lineObj.LineNumber, true);
   //     return;
@@ -2713,7 +2783,7 @@ function ReceiveCall(session) {
 
   if (CurrentCalls >= 1) {
     if (CallWaitingEnabled == false || CallWaitingEnabled == "disabled") {
-      console.log("Call Waiting Disabled, rejecting call.");
+      //("Call Waiting Disabled, rejecting call.");
       lineObj.SipSession.data.earlyReject = true;
       RejectCall(lineObj.LineNumber, true);
       return;
@@ -2812,7 +2882,7 @@ function ReceiveCall(session) {
   ) {
     if (CurrentCalls == 0) {
       // There are no other calls, so you can answer
-      console.log("Going to Auto Answer this call...");
+      //("Going to Auto Answer this call...");
       window.setTimeout(function () {
         // If the call is with video, assume the auto answer is also
         // In order for this to work nicely, the recipient maut be "ready" to accept video calls
@@ -2879,7 +2949,7 @@ function ReceiveCall(session) {
   if (EnableRingtone == true) {
     if (CurrentCalls >= 1) {
       // Play Alert
-      console.log("Audio:", audioBlobs.CallWaiting.url);
+      //("Audio:", audioBlobs.CallWaiting.url);
       var ringer = new Audio(audioBlobs.CallWaiting.blob);
       ringer.preload = "auto";
       ringer.loop = false;
@@ -2891,7 +2961,7 @@ function ReceiveCall(session) {
           ringer
             .setSinkId(getRingerOutputID())
             .then(function () {
-              console.log("Set sinkId to:", getRingerOutputID());
+              //("Set sinkId to:", getRingerOutputID());
             })
             .catch(function (e) {
               console.warn("Failed not apply setSinkId.", e);
@@ -2910,7 +2980,7 @@ function ReceiveCall(session) {
       lineObj.SipSession.data.ringerObj = ringer;
     } else {
       // Play Ring Tone
-      console.log("Audio:", audioBlobs.Ringtone.url);
+      //("Audio:", audioBlobs.Ringtone.url);
       var ringer = new Audio(audioBlobs.Ringtone.blob);
       ringer.preload = "auto";
       ringer.loop = true;
@@ -2922,7 +2992,7 @@ function ReceiveCall(session) {
           ringer
             .setSinkId(getRingerOutputID())
             .then(function () {
-              console.log("Set sinkId to:", getRingerOutputID());
+              //("Set sinkId to:", getRingerOutputID());
             })
             .catch(function (e) {
               console.warn("Failed not apply setSinkId.", e);
@@ -3196,7 +3266,7 @@ export function BlindTransfer(dstNo, callbacks) {
   var transferOptions = {
     requestDelegate: {
       onAccept: function (sip) {
-        console.log("Blind transfer Accepted");
+        //("Blind transfer Accepted");
 
         session.data.terminateby = "us";
         session.data.reasonCode = 202;
@@ -3228,7 +3298,7 @@ export function BlindTransfer(dstNo, callbacks) {
       },
     },
   };
-  console.log("REFER: ", dstNo + "@" + domain);
+  //("REFER: ", dstNo + "@" + domain);
   var referTo = UserAgent.makeURI(
     "sip:" + dstNo.replace(/#/g, "%23") + "@" + domain
   );
@@ -3325,7 +3395,7 @@ export function AttendedTransfer(num, callbacks) {
   }
 
   // Create new call session
-  console.log("TRANSFER INVITE: ", "sip:" + num + "@" + domain);
+  //("TRANSFER INVITE: ", "sip:" + num + "@" + domain);
   var targetURI = UserAgent.makeURI(
     "sip:" + num.replace(/#/g, "%23") + "@" + domain
   );
@@ -3357,9 +3427,9 @@ export function AttendedTransfer(num, callbacks) {
                 remoteAudio
                   .setSinkId(session.data.AudioOutputDevice)
                   .then(function () {
-                    console.log(
-                      "sinkId applied: " + session.data.AudioOutputDevice
-                    );
+                    //(
+                    //   "sinkId applied: " + session.data.AudioOutputDevice
+                    // );
                   })
                   .catch(function (e) {
                     console.warn("Error using setSinkId: ", e);
@@ -3396,7 +3466,7 @@ export function AttendedTransfer(num, callbacks) {
       },
       onRedirect: function (sip) {
         callbacks?.onRedirect();
-        console.log("Redirect received:", sip);
+        //("Redirect received:", sip);
       },
       onAccept: function (sip) {
         callbacks?.onAccept(session, transferId);
@@ -3410,7 +3480,7 @@ export function AttendedTransfer(num, callbacks) {
         // }, 1000);
       },
       onReject: function (sip) {
-        // console.log("New call session rejected: ", sip.message.reasonPhrase);
+        // //("New call session rejected: ", sip.message.reasonPhrase);
         callbacks?.onBye();
         session.data.transfer[transferId].disposition =
           sip.message.reasonPhrase;
@@ -3443,7 +3513,7 @@ export function CompleteTransfer(session, newSession, transferId, callbacks) {
   var transferOptions = {
     requestDelegate: {
       onAccept: function (sip) {
-        console.log("Attended transfer Accepted");
+        //("Attended transfer Accepted");
         session.data.terminateby = "us";
         session.data.reasonCode = 202;
         session.data.reasonText = "Attended Transfer";
@@ -3505,7 +3575,7 @@ export function RejectCall() {
         );
       });
   }
-  console.log("call rejected");
+  //("call rejected");
 
   session.data.terminateby = "us";
   session.data.reasonCode = 486;
@@ -3517,7 +3587,7 @@ export function RejectCall() {
 function onSessionReceivedBye(lineObj, response) {
   // They Ended the call
 
-  console.log("Call ended, bye!");
+  //("Call ended, bye!");
 
   lineObj.SipSession.data.terminateby = "them";
   lineObj.SipSession.data.reasonCode = 16;
@@ -3559,10 +3629,10 @@ function onSessionReinvited(lineObj, response) {
         });
       }
     }
-    console.log(
-      "videoChannelNames:",
-      lineObj.SipSession.data.videoChannelNames
-    );
+    //(
+    //   "videoChannelNames:",
+    //   lineObj.SipSession.data.videoChannelNames
+    // );
     // RedrawStage(lineObj.LineNumber, false);
   }
 }
@@ -3580,25 +3650,25 @@ function onSessionReceivedMessage(lineObj, response) {
     if (!session.data.ConfbridgeEvents) session.data.ConfbridgeEvents = [];
 
     if (msgJson.type == "ConfbridgeStart") {
-      console.log("ConfbridgeStart!");
+      //("ConfbridgeStart!");
     } else if (msgJson.type == "ConfbridgeWelcome") {
-      console.log("Welcome to the Asterisk Conference");
-      console.log("Bridge ID:", msgJson.bridge.id);
-      console.log("Bridge Name:", msgJson.bridge.name);
-      console.log("Created at:", msgJson.bridge.creationtime);
-      console.log("Video Mode:", msgJson.bridge.video_mode);
+      //("Welcome to the Asterisk Conference");
+      //("Bridge ID:", msgJson.bridge.id);
+      //("Bridge Name:", msgJson.bridge.name);
+      //("Created at:", msgJson.bridge.creationtime);
+      //("Video Mode:", msgJson.bridge.video_mode);
 
       session.data.ConfbridgeChannels = msgJson.channels; // Write over this
       session.data.ConfbridgeChannels.forEach(function (chan) {
         // The mute and unmute status doesn't appear to be a realtime state, only what the
         // startmuted= setting of the default profile is.
-        console.log(
-          chan.caller.name,
-          "Is in the conference. Muted:",
-          chan.muted,
-          "Admin:",
-          chan.admin
-        );
+        //(
+        //   chan.caller.name,
+        //   "Is in the conference. Muted:",
+        //   chan.muted,
+        //   "Admin:",
+        //   chan.admin
+        // );
       });
     } else if (msgJson.type == "ConfbridgeJoin") {
       msgJson.channels.forEach(function (chan) {
@@ -3616,11 +3686,11 @@ function onSessionReceivedMessage(lineObj, response) {
               ") joined the conference",
             eventTime: utcDateNow(),
           });
-          console.log(
-            chan.caller.name,
-            "Joined the conference. Muted: ",
-            chan.muted
-          );
+          //(
+          //   chan.caller.name,
+          //   "Joined the conference. Muted: ",
+          //   chan.muted
+          // );
         }
       });
     } else if (msgJson.type == "ConfbridgeLeave") {
@@ -3628,7 +3698,7 @@ function onSessionReceivedMessage(lineObj, response) {
         session.data.ConfbridgeChannels.forEach(function (existingChan, i) {
           if (existingChan.id == chan.id) {
             session.data.ConfbridgeChannels.splice(i, 1);
-            console.log(chan.caller.name, "Left the conference");
+            //(chan.caller.name, "Left the conference");
             session.data.ConfbridgeEvents.push({
               event:
                 chan.caller.name +
@@ -3647,11 +3717,11 @@ function onSessionReceivedMessage(lineObj, response) {
       //     videoContainer.find("video").each(function () {
       //       if (this.srcObject.channel && this.srcObject.channel == chan.id) {
       //         if (chan.talking_status == "on") {
-      //           console.log(chan.caller.name, "is talking.");
+      //           //(chan.caller.name, "is talking.");
       //           this.srcObject.isTalking = true;
       //           // //this).css("border", "1px solid red");
       //         } else {
-      //           console.log(chan.caller.name, "stopped talking.");
+      //           //(chan.caller.name, "stopped talking.");
       //           this.srcObject.isTalking = false;
       //           // //this).css("border", "1px solid transparent");
       //         }
@@ -3663,7 +3733,7 @@ function onSessionReceivedMessage(lineObj, response) {
       msgJson.channels.forEach(function (chan) {
         session.data.ConfbridgeChannels.forEach(function (existingChan) {
           if (existingChan.id == chan.id) {
-            console.log(existingChan.caller.name, "is now muted");
+            //(existingChan.caller.name, "is now muted");
             existingChan.muted = true;
           }
         });
@@ -3673,14 +3743,14 @@ function onSessionReceivedMessage(lineObj, response) {
       msgJson.channels.forEach(function (chan) {
         session.data.ConfbridgeChannels.forEach(function (existingChan) {
           if (existingChan.id == chan.id) {
-            console.log(existingChan.caller.name, "is now unmuted");
+            //(existingChan.caller.name, "is now unmuted");
             existingChan.muted = false;
           }
         });
       });
       // RedrawStage(lineObj.LineNumber, false);
     } else if (msgJson.type == "ConfbridgeEnd") {
-      console.log("The Asterisk Conference has ended, bye!");
+      //("The Asterisk Conference has ended, bye!");
     } else {
       console.warn("Unknown Asterisk Conference Event:", msgJson.type, msgJson);
     }
@@ -3689,7 +3759,7 @@ function onSessionReceivedMessage(lineObj, response) {
   } else if (
     messageType.indexOf("application/x-myphone-confbridge-chat") > -1
   ) {
-    console.log("x-myphone-confbridge-chat", response);
+    //("x-myphone-confbridge-chat", response);
 
     response.accept();
   } else {
@@ -3706,14 +3776,14 @@ function onSessionDescriptionHandlerCreated(
 ) {
   if (sdh) {
     if (sdh.peerConnection) {
-      // console.log(sdh);
+      // //(sdh);
       sdh.peerConnection.ontrack = function () {
-        // console.log(event);
+        // //(event);
         onTrackAddedEvent(lineObj, includeVideo);
       };
       // sdh.peerConnectionDelegate = {
       //     ontrack: function(event){
-      //         console.log(event);
+      //         //(event);
       //         onTrackAddedEvent(lineObj, includeVideo);
       //     }
       // }
@@ -3744,19 +3814,19 @@ function onTrackAddedEvent(lineObj, includeVideo) {
     var receiver = transceiver.receiver;
     if (receiver.track) {
       if (receiver.track.kind == "audio") {
-        console.log("Adding Remote Audio Track");
+        //("Adding Remote Audio Track");
         inCall = true;
         remoteAudioStream.addTrack(receiver.track);
       }
       if (includeVideo && receiver.track.kind == "video") {
         if (transceiver.mid) {
           receiver.track.mid = transceiver.mid;
-          console.log(
-            "Adding Remote Video Track - ",
-            receiver.track.readyState,
-            "MID:",
-            receiver.track.mid
-          );
+          //(
+          //   "Adding Remote Video Track - ",
+          //   receiver.track.readyState,
+          //   "MID:",
+          //   receiver.track.mid
+          // );
           remoteVideoStream.addTrack(receiver.track);
         }
       }
@@ -3771,7 +3841,7 @@ function onTrackAddedEvent(lineObj, includeVideo) {
         remoteAudio
           .setSinkId(getAudioOutputID())
           .then(function () {
-            console.log("sinkId applied: " + getAudioOutputID());
+            //("sinkId applied: " + getAudioOutputID());
             OnStatusChange("In Progress");
           })
           .catch(function (e) {
@@ -3792,7 +3862,7 @@ function onTrackAddedEvent(lineObj, includeVideo) {
   //       thisRemoteVideoStream.trackID = remoteVideoStreamTrack.id;
   //       thisRemoteVideoStream.mid = remoteVideoStreamTrack.mid;
   //       remoteVideoStreamTrack.onended = function () {
-  //         console.log("Video Track Ended: ", this.mid);
+  //         //("Video Track Ended: ", this.mid);
   //         RedrawStage(lineObj.LineNumber, true);
   //       };
   //       thisRemoteVideoStream.addTrack(remoteVideoStreamTrack);
@@ -3830,17 +3900,17 @@ function onTrackAddedEvent(lineObj, includeVideo) {
   //         // videoObj.play();
   //         videoEl.show();
   //         videoEl.parent().show();
-  //         console.log("Playing Video Stream MID:", thisRemoteVideoStream.mid);
+  //         //("Playing Video Stream MID:", thisRemoteVideoStream.mid);
   //         RedrawStage(lineObj.LineNumber, true);
   //       };
   //       wrapper.append(videoEl);
 
   //       //"#line-" + lineObj.LineNumber + "-remote-videos").append(wrapper);
 
-  //       console.log("Added Video Element MID:", thisRemoteVideoStream.mid);
+  //       //("Added Video Element MID:", thisRemoteVideoStream.mid);
   //     });
   //   } else {
-  //     console.log("No Video Streams");
+  //     //("No Video Streams");
   //     RedrawStage(lineObj.LineNumber, true);
   //   }
   // }

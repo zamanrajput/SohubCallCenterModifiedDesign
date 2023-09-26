@@ -20,10 +20,10 @@ import { useSelector, useDispatch } from "../../../store/Store";
 import Scrollbar from "../../custom-scroll/Scrollbar";
 import {
   SelectChat,
-  fetchChats,
+  
   SearchChat,
 } from "../../../store/apps/chat/ChatSlice";
-import { ChatsType } from "../../../types/apps/chat";
+
 import { last } from "lodash";
 import { formatDistanceToNowStrict } from "date-fns";
 import {
@@ -33,27 +33,30 @@ import {
   IconGridDots,
   IconSearch,
 } from "@tabler/icons-react";
-import { getUserData } from "../../../utils/utils";
 import { Cancel, Dialpad, Keyboard, ListAlt } from "@mui/icons-material";
 import AppButton from "../../shared/CustomButton";
 import AppDialpad from "../../shared/CustomDialpad";
-
-import OutgoingCallDialog from "../../shared/OutGoingCall";
 import { DialByLine } from "../../../utils/SipDiamond";
 import {
+  resetTimer,
   setAudioSinkRef,
+  setGlobalError,
   setInCall,
   setInCallExtNumber,
   setInCallStatus,
+  setInCallUser,
   setInCallUsername,
-  setIncomingCallStatus,
-  setIncomingDialogVisibilty,
-  setIncomingExtNum,
   setOutGoingExtNum,
   setOutGoingUserName,
   setOutgoingCallStatus,
   setOutgoingDialogVisibilty,
+  startTimer,
 } from "../../../store/home/HomeSlice";
+import { getCreds, loadUser } from "../../../store/auth/AuthSlice";
+import { Chat } from "../../../types/response_schemas";
+import { getFileTypeFromUrl, getOpponentUser } from "../../../utils/utils";
+import { getUserFromExt } from "../../../utils/WebSocket";
+import User from "../../../types/auth/User";
 
 
 
@@ -67,20 +70,24 @@ import {
 
 
 const ChatListing = () => {
+
   const data = useSelector((state) => state.homeReducer);
 
   const dispatch = useDispatch();
-  const activeChat = useSelector((state) => state.chatReducer.chatContent);
+  const activeChat = useSelector((state) => state.chatReducer.activeChatIndex);
+
+  const authReducer = useSelector((x)=>x.authReducer);
 
   useEffect(() => {
-    dispatch(fetchChats());
+  
+    // dispatch(fetchChats(authReducer.user?.id));
   }, [dispatch]);
 
-  const filterChats = (chats: ChatsType[], cSearch: string) => {
-    if (chats)
-      return chats.filter((t) =>
-        t.name.toLocaleLowerCase().includes(cSearch.toLocaleLowerCase())
-      );
+  const filterChats = (chats: Chat[], cSearch: string) => {
+    // if (chats)
+    //   return chats.filter((t) =>
+    //     // t.name.toLocaleLowerCase().includes(cSearch.toLocaleLowerCase())
+    //   );
 
     return chats;
   };
@@ -89,21 +96,23 @@ const ChatListing = () => {
     filterChats(state.chatReducer.chats, state.chatReducer.chatSearch)
   );
 
-  const getDetails = (conversation: ChatsType) => {
+  const thisUser = useSelector((c)=>c.authReducer.user);
+
+  const getDetails = (conversation: Chat) => {
     let displayText = "";
 
     const lastMessage = conversation.messages[conversation.messages.length - 1];
     if (lastMessage) {
-      const sender = lastMessage.senderId === conversation.id ? "You: " : "";
+      const sender = lastMessage.from_id === thisUser?.id ? "You: " : "";
       const message =
-        lastMessage.type === "image" ? "Sent a photo" : lastMessage.msg;
+        getFileTypeFromUrl(lastMessage.attachment_url) === "jpg" ? "Sent a photo" : lastMessage.message;
       displayText = `${sender}${message}`;
     }
 
     return displayText;
   };
 
-  const lastActivity = (chat: ChatsType) => last(chat.messages)?.createdAt;
+  const lastActivity = (chat: Chat) => last(chat.messages);
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -118,7 +127,7 @@ const ChatListing = () => {
 
   const [dialpadOpen, setDialPadOpen] = useState<boolean>(false);
 
-  const userData = getUserData();
+  const userData = useSelector((state) => state.authReducer.user);
 
   const [num, setNumberStr] = useState<string>("");
 
@@ -130,41 +139,42 @@ const ChatListing = () => {
     onTry: () => {
 
 
-      console.log('ABCD:  onTry');
+      //('ABCD:  onTry');
 
 
       dispatch(setOutgoingCallStatus("Calling..."));
-      console.log("outgoinCallbacks", "onTry");
+      //("outgoinCallbacks", "onTry");
     },
     onRinging: () => {
 
-      console.log('ABCD:  onRinging');
+      //('ABCD:  onRinging');
 
 
 
       dispatch(setOutgoingCallStatus("Ringing..."));
-      console.log("outgoinCallbacks", "onRinging");
+      //("outgoinCallbacks", "onRinging");
     },
     onRedirect: () => {
 
-      console.log('ABCD:  onRedirect');
+      //('ABCD:  onRedirect');
 
 
 
-      console.log("outgoinCallbacks", "onRedirect");
+      //("outgoinCallbacks", "onRedirect");
       dispatch(setOutgoingCallStatus("Redirecting"));
       dispatch(setOutgoingDialogVisibilty(true));
     },
     onAccept: () => {
 
-      console.log('ABCD:  onAccept');
+      //('ABCD:  onAccept');
       dispatch(setInCall(true));
       dispatch(setOutgoingDialogVisibilty(false));
-  
+      dispatch(startTimer())
+
     },
     onReject: () => {
 
-      console.log('ABCD:  onReject');
+      //('ABCD:  onReject');
 
       dispatch(setOutgoingCallStatus("Call Rejected"));
       dispatch(setOutgoingDialogVisibilty(false));
@@ -172,21 +182,22 @@ const ChatListing = () => {
       dispatch(setOutGoingExtNum(""));
       dispatch(setOutGoingUserName(""));
       dispatch(setInCall(false));
-      console.log("outgoinCallbacks", "onReject");
+      dispatch(resetTimer(0));
+      //("outgoinCallbacks", "onReject");
     },
-   
-  
+
+
     onHang: () => {
-      console.log('ABCD:  onHang');
+      //('ABCD:  onHang');
 
 
 
-      console.log("outgoinCallbacks", "onEnd");
+      //("outgoinCallbacks", "onEnd");
 
       dispatch(setOutgoingCallStatus("Call Ended"));
       dispatch(setOutgoingDialogVisibilty(false));
 
-      console.log("XYZ:DATA CLEARED");
+      //("XYZ:DATA CLEARED");
       dispatch(setInCall(false));
       dispatch(setInCallExtNumber(""));
       dispatch(setInCallUsername(""));
@@ -201,20 +212,42 @@ const ChatListing = () => {
 
 
   function onCallButtonClick(number: string) {
-    const opts: any = {
-      type: "audio",
-      num: number,
-      callBacks:outgoingCallbacks
-    };
+    var targetUser:User|null; 
+     getUserFromExt(number,(found)=>{
+      targetUser = found;
 
-    DialByLine(opts);
-    dispatch(setOutGoingExtNum(number));
-    dispatch(setOutGoingUserName("Unknown"));
-    dispatch(setOutgoingCallStatus("Calling"));
-    dispatch(setInCallUsername('Unknown'));
-    dispatch(setInCallExtNumber(number));
-    dispatch(setInCallStatus('Calling...'))
+      const opts: any = {
+        type: "audio",
+        num: number,
+        callBacks: outgoingCallbacks
+      };
+  
+
+      DialByLine(opts);
+      dispatch(setInCallUser(targetUser));
+      dispatch(setOutgoingDialogVisibilty(true));
+      dispatch(setOutGoingExtNum(number));
+      dispatch(setOutGoingUserName(found.display_name));
+      dispatch(setOutgoingCallStatus("Calling"));
+      dispatch(setInCallUsername(found.display_name));
+      dispatch(setInCallExtNumber(number));
+      dispatch(setInCallStatus('Calling...'));
+
+     },()=>{
+      dispatch(setGlobalError({
+        visibility:true,
+        title:"Not Found",
+        message:"The User with Extension Number "+number+" Not Found"
+      }))
+      return;
+     });
+
+
+ 
   }
+
+
+
 
   return (
     <div>
@@ -232,16 +265,16 @@ const ChatListing = () => {
           color="success"
         >
           <Avatar
-            alt={userData.user_name}
-            src={userData.avatar}
+            alt={userData?.display_name}
+            src={userData?.display_picture}
             sx={{ width: 54, height: 54 }}
           />
         </Badge>
         <Box>
           <Typography variant="body1" fontWeight={600}>
-            {userData.user_name}
+            {userData?.display_name}
           </Typography>
-          <Typography variant="body2">{`Ext: ${userData.extension}`}</Typography>
+          <Typography variant="body2">{`Ext: ${userData?.sip_extension}`}</Typography>
           <Typography variant="body2">Online</Typography>
         </Box>
       </Box>
@@ -314,28 +347,29 @@ const ChatListing = () => {
             }}
           >
             {chats && chats.length ? (
-              chats.map((chat) => (
+              chats.map((chat:Chat,index) => (
                 <ListItemButton
                   key={chat.id}
-                  onClick={() => dispatch(SelectChat(chat.id))}
+                  onClick={() => dispatch(SelectChat(index))}
                   sx={{
                     mb: 0.5,
                     py: 2,
                     px: 3,
                     alignItems: "start",
                   }}
-                  selected={activeChat === chat.id}
+                  selected={activeChat === index}
                 >
                   <ListItemAvatar>
                     <Badge
                       color={
-                        chat.status === "online"
-                          ? "success"
-                          : chat.status === "busy"
-                          ? "error"
-                          : chat.status === "away"
-                          ? "warning"
-                          : "secondary"
+                        'success'
+                        // getOpponentUser(chat,authReducer.user?).status=== "online"
+                        //   ? "success"
+                        //   : chat.status === "busy"
+                        //     ? "error"
+                        //     : chat.status === "away"
+                        //       ? "warning"
+                        //       : "secondary"
                       }
                       variant="dot"
                       anchorOrigin={{
@@ -345,8 +379,8 @@ const ChatListing = () => {
                       overlap="circular"
                     >
                       <Avatar
-                        alt="Remy Sharp"
-                        src={chat.thumb}
+                        alt={"Profile Picture"}
+                        src={getOpponentUser(chat,authReducer.user?.id).display_picture}
                         sx={{ width: 42, height: 42 }}
                       />
                     </Badge>
@@ -354,7 +388,7 @@ const ChatListing = () => {
                   <ListItemText
                     primary={
                       <Typography variant="subtitle2" fontWeight={600} mb={0.5}>
-                        {chat.name}
+                        {getOpponentUser(chat,authReducer.user?.id).display_name}
                       </Typography>
                     }
                     secondary={getDetails(chat)}
@@ -365,9 +399,9 @@ const ChatListing = () => {
                   />
                   <Box sx={{ flexShrink: "0" }} mt={0.5}>
                     <Typography variant="body2">
-                      {formatDistanceToNowStrict(new Date(lastActivity(chat)), {
+                      {/* {formatDistanceToNowStrict(new Date(lastActivity(chat)), {
                         addSuffix: false,
-                      })}
+                      })} */}
                     </Typography>
                   </Box>
                 </ListItemButton>
@@ -405,7 +439,7 @@ const ChatListing = () => {
                 ),
               }}
               fullWidth
-              onChange={(e) => {}}
+              onChange={(e) => { }}
             />
 
             <AppButton
@@ -432,7 +466,6 @@ const ChatListing = () => {
             {num.length > 0 ? (
               <Button
                 onClick={() => {
-                  dispatch(setOutgoingDialogVisibilty(true));
                   onCallButtonClick(num);
                 }}
                 sx={{

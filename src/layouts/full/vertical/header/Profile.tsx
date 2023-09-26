@@ -13,10 +13,16 @@ import * as dropdownData from './data';
 
 import { IconMail } from '@tabler/icons-react';
 import { Stack } from '@mui/system';
-import { clearDb, getUserData } from '../../../../utils/utils';
+import { dispatch, useSelector } from '../../../../store/Store';
+import { setCreds } from '../../../../store/auth/AuthSlice';
+
 
 
 const Profile = () => {
+
+
+  const userData = useSelector((x)=>x.authReducer.user);
+
   const [anchorEl2, setAnchorEl2] = useState(null);
   const handleClick2 = (event: any) => {
     setAnchorEl2(event.currentTarget);
@@ -41,8 +47,8 @@ const Profile = () => {
         onClick={handleClick2}
       >
         <Avatar
-          src={getUserData().avatar}
-          alt={getUserData().user_name}
+          src={userData?.display_picture}
+          alt={userData?.display_name}
           sx={{
             width: 35,
             height: 35,
@@ -69,10 +75,10 @@ const Profile = () => {
       >
         <Typography variant="h5">User Profile</Typography>
         <Stack direction="row" py={3} spacing={2} alignItems="center">
-        <Avatar src={getUserData().avatar} alt={"ProfileImg"} sx={{ width: 95, height: 95 }} />
+        <Avatar src={userData?.display_picture} alt={"ProfileImg"} sx={{ width: 95, height: 95 }} />
           <Box>
             <Typography variant="subtitle2" color="textPrimary" fontWeight={600}>
-             {getUserData().user_name}
+             {userData?.display_name}
             </Typography>
             <Typography variant="subtitle2" color="textSecondary">
               Online
@@ -85,7 +91,7 @@ const Profile = () => {
               gap={1}
             >
               <IconMail width={15} height={15} />
-              {`${getUserData().extension}@sohub.com`}
+              {`${userData?.email}`}
             </Typography>
           </Box>
         </Stack>
@@ -157,7 +163,7 @@ const Profile = () => {
               <img src={"/images/backgrounds/unlimited-bg.png"} alt="unlimited" className="signup-bg" width={150} height={183}></img>
             </Box>
           </Box>
-          <Button onClick={()=>{clearDb()}} href="/auth/login" variant="outlined" color="primary" component={Link} fullWidth>
+          <Button onClick={()=>{dispatch(setCreds({email:'',password:''}))}} href="/auth/login" variant="outlined" color="primary" component={Link} fullWidth>
             Logout
           </Button>
         </Box>

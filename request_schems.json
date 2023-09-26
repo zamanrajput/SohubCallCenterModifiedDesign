@@ -1,0 +1,46 @@
+
+{
+    "get_chats":{
+        "route":"get_chats",
+        "id":"string|int"
+    },
+    "register_user":{
+        "route":"register_user",
+        "data":{
+            "display_name": "John Doe",
+            "email": "john@example.com",
+            "display_picture": "https://example.com/profile-picture.jpg",
+            "sip_extension": "1001",
+            "sip_password": "s3cr3t",
+            "password": "hashed_password"
+        }
+    },
+    "login":{
+        "route":"login",
+        "data":{
+            "email":"user1@sohub.com",
+            "password":"12345678"
+        }
+    },
+    "new_chat":{
+        "route":"new_chat",
+        "data":{
+            "members":"string,string"
+        }
+    },
+    "new_message":{
+        "route":"new_message",
+        "data":{
+            "chat_id":"string",
+            "to_id":"from_id",
+            "attachment_url":"",
+            "message":"this is message"
+        }
+    },
+    "get_user_from_ext":{
+        "route":"user_from_ext",
+        "ext":"sip_extension"
+    }
+    
+
+}

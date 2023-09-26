@@ -18,63 +18,54 @@ import { useState } from "react";
 import WarningDialog from "../../../src/components/ui-components/dialog/WarningDialog";
 import { loginWithPanel } from "../../../src/utils/API";
 import {
-  UserDataType,
-  getUserData,
   navigateTo,
-  saveData,
+
 } from "../../../src/utils/utils";
 import Image from "next/image";
+import { dispatch, useSelector } from "../../../src/store/Store";
+import { getCreds, loadUser as loginUser, setCreds, setError, setWarning } from "../../../src/store/auth/AuthSlice";
 
 const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
   const [password, setPassword] = useState<string>("");
   const [username, setUsername] = useState<string>("");
-  const [warning, setWarning] = useState<string>("");
-  const [warningTitle, setWarningTitle] = useState<string>("");
-  const [open, setOpen] = useState<boolean>(false);
 
-  const data = getUserData();
+  const [warningTitle, setWarningTitle] = useState<string>("Authentication Failed!");
 
-  if (data.login_status === "success") {
-    navigateTo("/");
+  
+  const authReducer = useSelector((state)=>state.authReducer);
+
+
+
+  function setOpen(value:any){
+    dispatch(setError(value));
   }
+
 
   function login() {
     if (password === "" || username === "") {
-      setWarning("Fill the both fields\n and try again");
+      dispatch(setWarning("Fill the both fields\n and try again"));
       setWarningTitle("");
-      setOpen(true);
+      dispatch(setError(true));
       return;
     }
-    loginWithPanel(username, password, (error, result) => {
-      if (error) {
-        setWarning(error.message);
-        setWarningTitle("Authentication Failed");
-        setOpen(true);
-      } else {
-        try {
-          const status = result.login_status;
-          if (status !== "success") {
-            setWarning(status);
-            setWarningTitle("Authentication Failed");
-            setOpen(true);
-            return;
-          }
+    setWarningTitle("Authentication Failed!");
+    dispatch(loginUser({ email: username, password: password },(/*success*/)=>{
+      navigateTo('/');
+    },()=>{
+      dispatch(setError(true));
+      dispatch(setWarning("Invalid email or password"));
+    }))
 
-          saveData(result as UserDataType);
-          navigateTo("/");
-        } catch (e) {
-          saveData(result as UserDataType);
+  }
 
-          navigateTo("/");
-        }
-      }
-    });
+  if(getCreds().email!=''){
+    navigateTo('/');
   }
 
   return (
     <>
-      <div style={{ width: "100%", display: "flex",justifyContent:'center' ,marginBottom:'40px'}}>
-        <div style={{ width: 200, height: 40}}>
+      <div style={{ width: "100%", display: "flex", justifyContent: 'center', marginBottom: '40px' }}>
+        <div style={{ width: 200, height: 40 }}>
           <Image
             src={"/logo_with_text.png"}
             alt={"Sohub Logo"}
@@ -84,7 +75,7 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
           />
         </div>
       </div>
-      
+
       {title ? (
         <Typography fontWeight="700" variant="h3" mb={1}>
           {title}
@@ -94,12 +85,12 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
       {subtext}
       <WarningDialog
         title={warningTitle}
-        warning={warning}
-        open={open}
+        warning={authReducer.message}
+        open={authReducer.error}
         setOpen={setOpen}
       />
 
-    
+
 
       <Stack>
         <Box>

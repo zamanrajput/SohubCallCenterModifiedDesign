@@ -1,4 +1,4 @@
-enum Routes {
+export enum Routes {
     GET_CHATS = 'get_chats',
     REGISTER_USER = 'register_user',
     LOGIN = 'login',

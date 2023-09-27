@@ -1,13 +1,17 @@
 import React from 'react';
 import { Box, Avatar, Typography, IconButton, Tooltip, useMediaQuery } from '@mui/material';
-import { useSelector } from '../../../../../store/Store';
+import { dispatch, useSelector } from '../../../../../store/Store';
 import { IconPower } from '@tabler/icons-react';
 import { AppState } from '../../../../../store/Store';
 import Link from 'next/link';
+import { setCreds } from '../../../../../store/auth/AuthSlice';
 
-import { clearDb, getUserData, navigateTo } from '../../../../../utils/utils';
+
 
 export const Profile = () => {
+
+  const userData = useSelector((x)=>x.authReducer.user);
+
   const customizer = useSelector((state: AppState) => state.customizer);
   const lgUp = useMediaQuery((theme: any) => theme.breakpoints.up('lg'));
   const hideMenu = lgUp ? customizer.isCollapse && !customizer.isSidebarHover : '';
@@ -24,7 +28,7 @@ export const Profile = () => {
           <Avatar alt="Remy Sharp" src={"/images/profile/user-1.jpg"} sx={{height: 40, width: 40}} />
 
           <Box>
-            <Typography variant="h6">{getUserData().extension}</Typography>
+            <Typography variant="h6">{userData?.display_name}</Typography>
             <Typography variant="caption">Support</Typography>
           </Box>
           <Box sx={{ ml: 'auto' }}>
@@ -35,7 +39,9 @@ export const Profile = () => {
                 href="auth/login"
                 aria-label="logout"
                 size="small"
-                onClick={()=>{clearDb();}}
+                onClick={()=>{
+                  dispatch(setCreds({email:'',password:""}))
+                }}
               >
                 <IconPower size="20" />
               </IconButton>

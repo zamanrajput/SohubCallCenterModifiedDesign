@@ -4,8 +4,9 @@ import {
   URL_LOGIN
 } from "./API_LINKS";
 
-import { clearDb, navigateTo } from "./utils";
+import {  navigateTo } from "./utils";
 import axios from "axios";
+import { setCreds } from "../store/auth/AuthSlice";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 const MakePostCall = (url:string, requestBody:object, callback:(error:any,result:any)=>any) => {
@@ -42,7 +43,7 @@ const MakeGetWithAuthCall = (url:string, token:string,  callback:(error:any,resu
     .then((response) => {
         if(response.status===401){
             //('status',response.status)
-            clearDb();
+            // setCreds();
             navigateTo('/auth/login');
             // document.location.reload();
             return;

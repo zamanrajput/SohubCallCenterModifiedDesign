@@ -11,13 +11,13 @@ import {
   IconButton,
   styled,
 } from "@mui/material";
-import { ChatsType } from "../../../types/apps/chat";
 import { uniq, flatten } from "lodash";
 import { IconDownload } from "@tabler/icons-react";
+import { Chat } from "../../../types/response_schemas";
 
 interface chatType {
   isInSidebar?: boolean;
-  chat?: ChatsType;
+  chat?: Chat;
 }
 
 const drawerWidth = 320;
@@ -25,12 +25,12 @@ const drawerWidth = 320;
 const ChatInsideSidebar = ({ isInSidebar, chat }: chatType) => {
   const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up("lg"));
   const totalAttachment = uniq(
-    flatten(chat?.messages.map((item) => item.attachment))
+    flatten(chat?.messages.map((item) => item.attachment_url))
   ).length;
   const totalMedia =
     uniq(
       flatten(
-        chat?.messages.map((item) => (item?.type === "image" ? item.msg : null))
+        chat?.messages.map((item) => (item?.attachment_url === "image" ? item.message : null))
       )
     ).length - 1;
 
@@ -69,9 +69,9 @@ const ChatInsideSidebar = ({ isInSidebar, chat }: chatType) => {
             {chat?.messages.map((c) => {
               return (
                 <Grid item xs={12} lg={4} key={c.id}>
-                  {c?.type === "image" ? (
+                  {c?.attachment_url === "image" ? (
                     <Avatar
-                      src={c?.msg}
+                      src={c?.message}
                       alt="media"
                       variant="rounded"
                       sx={{ width: "72px", height: "72px" }}
@@ -96,7 +96,7 @@ const ChatInsideSidebar = ({ isInSidebar, chat }: chatType) => {
             {chat?.messages.map((c, index) => {
               return (
                 <Stack spacing={2.5} key={index} direction="column">
-                  {c?.attachment?.map((a, index) => {
+                  {/* {c?.attachment_url?.map((a, index) => {
                     return (
                       <StyledStack key={index} direction="row" gap={2}>
                         <Avatar
@@ -131,7 +131,7 @@ const ChatInsideSidebar = ({ isInSidebar, chat }: chatType) => {
                         </Box>
                       </StyledStack>
                     );
-                  })}
+                  })} */}
                 </Stack>
               );
             })}

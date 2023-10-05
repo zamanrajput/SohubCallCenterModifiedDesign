@@ -64,14 +64,12 @@ export default function Modern() {
       dispatch(setInCall(false));
       dispatch(setIncomingCallStatus("Ended"));
     },
+    onInviteCancel:function (){
+      dispatch(setIncomingDialogVisibilty(false));
+
+    },
     onInvite: function onInvite(invitation: Invitation) {
 
-      invitation.incomingInviteRequest.delegate = {
-        onCancel: (session: any) => {
-          // console.log(session);
-          dispatch(setIncomingDialogVisibilty(false));
-        }
-      }
 
 
 

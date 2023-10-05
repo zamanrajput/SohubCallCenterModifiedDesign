@@ -2776,14 +2776,14 @@ function ReceiveCall(session,callbacks) {
   };
  
 
-  //handled on fron-end
-  // lineObj.SipSession.incomingInviteRequest.delegate = {
-  //   onCancel: function (sip) {
-  //     console.log('Incoming cancel')
 
-  //     onInviteCancel(lineObj, sip);
-  //   },
-  // };
+  lineObj.SipSession.incomingInviteRequest.delegate = {
+    onCancel: function (sip) {
+      console.log('Incoming cancel')
+
+      callbacks.onInviteCancel();
+    },
+  };
 
  
 

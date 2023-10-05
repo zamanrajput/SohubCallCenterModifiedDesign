@@ -44,6 +44,7 @@ export interface NewMessageRequest {
     from_id: string,
     attachment_url: string;
     message: string;
+    type:'text'|'image'
   };
 }
 
@@ -83,5 +84,6 @@ const newMessageRequest: NewMessageRequest = {
     to_id: 'from_id',
     attachment_url: '',
     message: 'this is message',
+    type:"text"
   },
 };

@@ -15,18 +15,23 @@ interface StateType {
   chats: Chat[];
   activeChatIndex: number;
   chatSearch: string;
+  selectFile:File|null
 }
 
 const initialState = {
   chats: [],
   activeChatIndex: 1,
   chatSearch: "",
+  selectFile:null
 };
 
 export const ChatSlice = createSlice({
   name: "chat",
   initialState,
   reducers: {
+    setSelectedFile:(state,action)=>{
+      state.selectFile = action.payload;
+    },
     setChats: (state, action) => {
       state.chats = action.payload;
       // //(JSON.stringify(state.chats));
@@ -59,13 +64,14 @@ export const registerChatsHook = (id: any) => async (dispatch: AppDispatch) => {
 }
 
 export const sendMsg = (data: any, chats: Chat[]) => async (dispatch: AppDispatch) => {
-  const { chat_id, from_id, to_id, message, attachment, sip_extension } = data;
+  const { chat_id, from_id, to_id, message, attachment_url, type } = data;
 
   const newMessage: ChatMessage = {
     id: '',
     chat_id: chat_id,
+    type : type,
     message: message,
-    attachment_url: attachment,
+    attachment_url: attachment_url,
     from_id: from_id,
     to_id: to_id,
     created_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),
@@ -81,6 +87,7 @@ export const sendMsg = (data: any, chats: Chat[]) => async (dispatch: AppDispatc
         to_id: newMessage.to_id,
         attachment_url: newMessage.attachment_url,
         message: newMessage.message,
+        type: type
       },
     }, onError(error) {
 
@@ -110,23 +117,23 @@ export const sendMsg = (data: any, chats: Chat[]) => async (dispatch: AppDispatc
     },
   })
 
-  sendChatMessage({
-    extNum: sip_extension,
-    message: message,
-    onFailed: (reason: any) => {
-      //("Failed to sent:", reason);
-    },
-    onSent: () => {
-      //("message sent");
-    },
-  });
+  // sendChatMessage({
+  //   extNum: sip_extension,
+  //   message: message==null?'':message,
+  //   onFailed: (reason: any) => {
+  //     //("Failed to sent:", reason);
+  //   },
+  //   onSent: () => {
+  //     //("message sent");
+  //   },
+  // });
 
 
 }
 
 
 
-export const createNewChat=(from: string, to: string) =>async(dispatch:AppDispatch)=>{
+export const createNewChat = (from: string, to: string) => async (dispatch: AppDispatch) => {
   socketRequest({
     data: {
       route: "new_chat",
@@ -136,10 +143,10 @@ export const createNewChat=(from: string, to: string) =>async(dispatch:AppDispat
     }, onError(error) {
 
     }, onResponse(response) {
-        dispatch(loadUser(getCreds(),()=>{
-          dispatch(SelectChat(0));
-        },()=>{}));
-       
+      dispatch(loadUser(getCreds(), () => {
+        dispatch(SelectChat(0));
+      }, () => { }));
+
     },
   })
 
@@ -147,7 +154,7 @@ export const createNewChat=(from: string, to: string) =>async(dispatch:AppDispat
 
 
 
-export const { SearchChat, setChats, SelectChat } = ChatSlice.actions;
+export const { SearchChat, setChats, SelectChat,setSelectedFile } = ChatSlice.actions;
 
 
 

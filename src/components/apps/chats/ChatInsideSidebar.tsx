@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Theme,
@@ -13,7 +13,8 @@ import {
 } from "@mui/material";
 import { uniq, flatten } from "lodash";
 import { IconDownload } from "@tabler/icons-react";
-import { Chat } from "../../../types/response_schemas";
+import { Chat, ChatMessage } from "../../../types/response_schemas";
+import ImageViewDialog from "../../imageViewDialog";
 
 interface chatType {
   isInSidebar?: boolean;
@@ -23,16 +24,23 @@ interface chatType {
 const drawerWidth = 320;
 
 const ChatInsideSidebar = ({ isInSidebar, chat }: chatType) => {
+
+
+
+  const [imageToView, setImageToView] = useState<string | null>(null);
+
+
+
   const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up("lg"));
-  const totalAttachment = uniq(
-    flatten(chat?.messages.map((item) => item.attachment_url))
-  ).length;
-  const totalMedia =
-    uniq(
-      flatten(
-        chat?.messages.map((item) => (item?.attachment_url === "image" ? item.message : null))
-      )
-    ).length - 1;
+  // const totalAttachment = uniq(
+  //   flatten(chat?.messages.map((item) => item.attachment_url))
+  // ).length;
+
+  
+  const mediaMessages:ChatMessage[] = [];
+  chat?.messages.forEach((x)=>{
+    if(x.type=='image') mediaMessages.push(x);
+  });
 
   const StyledStack = styled(Stack)(() => ({
     ".showOnHover": {
@@ -45,6 +53,7 @@ const ChatInsideSidebar = ({ isInSidebar, chat }: chatType) => {
 
   return (
     <>
+
       {isInSidebar ? (
         <Box
           sx={{
@@ -62,19 +71,26 @@ const ChatInsideSidebar = ({ isInSidebar, chat }: chatType) => {
           }}
           p={3}
         >
+          <ImageViewDialog
+            label=""
+            open={imageToView != null}
+            imageUrl={imageToView ?? ''}
+            onClose={() => setImageToView(null)}
+          />
           <Typography variant="h6" mb={2}>
-            Media ({totalMedia})
+            Media ({mediaMessages.length})
           </Typography>
-          <Grid container spacing={2}>
-            {chat?.messages.map((c) => {
+          <Grid container rowSpacing={2} columnSpacing={0} >
+            {mediaMessages.map((c) => {
               return (
                 <Grid item xs={12} lg={4} key={c.id}>
-                  {c?.attachment_url === "image" ? (
+                  {c?.type === "image" ? (
                     <Avatar
-                      src={c?.message}
+                      onClick={() => setImageToView(c?.attachment_url)}
+                      src={c?.attachment_url}
                       alt="media"
                       variant="rounded"
-                      sx={{ width: "72px", height: "72px" }}
+                      sx={{ width: "85px", height: "85px" }}
                     />
                   ) : (
                     ""
@@ -83,16 +99,16 @@ const ChatInsideSidebar = ({ isInSidebar, chat }: chatType) => {
               );
             })}
             <Grid item xs={12} lg={12}>
-              {totalMedia === 0 ? (
+              {mediaMessages.length === 0 ? (
                 <Alert severity="error">No Media Found!</Alert>
               ) : null}
             </Grid>
           </Grid>
 
-          <Typography variant="h6" mt={5} mb={2}>
+          {/* <Typography variant="h6" mt={5} mb={2}>
             Attachments ({totalAttachment})
-          </Typography>
-          <Box>
+          </Typography> */}
+          <Box sx={{ display: 'none' }}>
             {chat?.messages.map((c, index) => {
               return (
                 <Stack spacing={2.5} key={index} direction="column">
@@ -135,9 +151,9 @@ const ChatInsideSidebar = ({ isInSidebar, chat }: chatType) => {
                 </Stack>
               );
             })}
-            {totalAttachment === 0 ? (
+            {/* {totalAttachment === 0 ? (
               <Alert severity="error">No Attachment Found!</Alert>
-            ) : null}
+            ) : null} */}
           </Box>
         </Box>
       ) : null}

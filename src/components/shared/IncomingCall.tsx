@@ -12,13 +12,17 @@ import {
   Typography,
 } from "@mui/material";
 import { useSelector, useDispatch } from "../../store/Store";
-import { setInCall, setIncomingDialogVisibilty, setOutgoingDialogVisibilty } from "../../store/home/HomeSlice";
+import { setInCall, setIncomingDialogVisibilty, setOutgoingDialogVisibilty, startTimer } from "../../store/home/HomeSlice";
 import { AnswerAudioCall, RejectCall } from "../../utils/SipDiamond";
+import { getChatIndex, getChatWithExt } from "../../utils/utils";
+import { SelectChat, createNewChat } from "../../store/apps/chat/ChatSlice";
 
 
 
 
 function IncomingCallDialog() {
+
+  const state = useSelector((x)=>x);
 
 
   const dispatch = useDispatch();
@@ -34,10 +38,20 @@ function IncomingCallDialog() {
   }
   function onAcceptClick() {
     //("Accepted by you");
+
+
+    const chat = getChatWithExt(state.chatReducer.chats,state.authReducer.user,state.homeReducer.incomingExtNum);
+    if(chat!=null){
+      dispatch(SelectChat(getChatIndex(state.chatReducer.chats,state.authReducer.user,chat.id)));
+    }else{
+      dispatch(createNewChat(state.authReducer.user?.id??'',state.homeReducer.inCallUser?.id??''));
+    }
+
     AnswerAudioCall();
     dispatch(setIncomingDialogVisibilty(false));
     dispatch(setOutgoingDialogVisibilty(false));
     dispatch(setInCall(true));
+    dispatch(startTimer());
   }
 
 

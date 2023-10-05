@@ -20,10 +20,17 @@ interface StateType {
     errorDialogMessage:string,
     errorDialogTitle:string,
     inCallUser:User|null,
-    inCallTimer:any
+    inCallTimer:any,
+    progressVisibility:boolean,
+    progresTitle:string,
+    uploadProgress:number
+
 }
 
 const initialState: StateType = {
+    uploadProgress:0,
+    progressVisibility:false,
+    progresTitle:'Sending Message',
     outGoingUserName: '',
     outGoingExtNum: '',
     outgoingCallStatus: '',
@@ -50,6 +57,15 @@ export const HomeSlice = createSlice({
     name: "Home",
     initialState: initialState,
     reducers: {
+        setUploadProgress(state,action){
+            state.uploadProgress = action.payload;
+        },
+        setProgressDialogVisibilty(state,action){
+            state.progressVisibility = action.payload;
+        },
+        setProgressTitle(state,action){
+            state.progresTitle = action.payload;
+        },
         resetTimer(state:StateType,action){
             state.inCallTimer = 0;
         },
@@ -70,7 +86,7 @@ export const HomeSlice = createSlice({
             state.outgoingCallDialogVisiblity = action.payload;
         },
         setIncomingUserName(state: StateType, action) {
-            state.outGoingUserName = action.payload;
+            state.incomingUserName = action.payload;
         },
         setIncomingExtNum(state: StateType, action) {
             state.incomingExtNum = action.payload;
@@ -118,6 +134,6 @@ export const  startTimer=() => async(dispatch:AppDispatch)=>{
 }
 
 
-export const {setGlobalError,setIncreamentTimer,resetTimer, setInCallExtNumber,setInCallStatus,setInCallUsername,setAudioSinkRef,setInCall,setOutGoingUserName, setOutGoingExtNum, setInCallUser,setOutgoingDialogVisibilty,setOutgoingCallStatus,setIncomingCallStatus,setIncomingUserName, setIncomingExtNum, setIncomingDialogVisibilty } = HomeSlice.actions;
+export const {setGlobalError,setIncreamentTimer,resetTimer, setInCallExtNumber,setInCallStatus,setInCallUsername,setAudioSinkRef,setInCall,setOutGoingUserName, setOutGoingExtNum, setInCallUser,setOutgoingDialogVisibilty,setOutgoingCallStatus,setIncomingCallStatus,setIncomingUserName, setIncomingExtNum, setIncomingDialogVisibilty,setProgressDialogVisibilty,setProgressTitle,setUploadProgress } = HomeSlice.actions;
 
 export default HomeSlice.reducer;

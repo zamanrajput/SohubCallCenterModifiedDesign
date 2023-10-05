@@ -5,6 +5,7 @@ export type ChatMessage = {
     chat_id: string;
     to_id: string;
     from_id: string;
+    type:'image'|'text';
     attachment_url: string;
     message: string;
     created_at: string;

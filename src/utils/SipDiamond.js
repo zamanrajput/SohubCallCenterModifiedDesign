@@ -128,11 +128,11 @@ let telAlphanumericRegEx = /[^\da-zA-Z*#+-_.!~'()]/g;
 //user config
 var domain = "webrtc-test.tolpar.com.bd";
 //over server is on websockets server, websockets working fine but not registering lemme run?ok run is these are okay?
-var username = "905";
-var password = "6fd9d726ded5a376713b8a874959bcc5";
+var username = "";
+var password = "";
 var socketPort = 8089;
 var wspath = "/ws";
-var displayName = "905";
+var displayName = "";
 
 //check these yes ok
 
@@ -995,12 +995,22 @@ export function sendDTMF(itemStr) {
 }
 
 var OnStatusChange;
-export function CreateUserAgent({ audioElementRef, onStatusChange ,onMessage}) {
+export function CreateUserAgent({ audioElementRef, onStatusChange ,onMessage,incomingCallBacks,user}) {
   PreloadAudioFiles();
   remoteAudio = audioElementRef;
   OnStatusChange = onStatusChange;
   //("Creating User Agent...");
   OnStatusChange("Connecting With Server");
+
+
+
+  username = user.sip_extension;
+  displayName = user.display_name;
+  password = user.sip_password;
+  
+
+
+
 
   profileUserID = username;
   var options = {
@@ -1019,7 +1029,7 @@ export function CreateUserAgent({ audioElementRef, onStatusChange ,onMessage}) {
         bundlePolicy: BundlePolicy,
         // certificates: undefined,
         // iceCandidatePoolSize: 10,
-        iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+        // iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
         // iceTransportPolicy: "all",
         // peerIdentity: undefined,
         // rtcpMuxPolicy: "require",
@@ -1040,7 +1050,8 @@ export function CreateUserAgent({ audioElementRef, onStatusChange ,onMessage}) {
     contactParams: {},
     delegate: {
       onInvite: function (sip) {
-        ReceiveCall(sip);
+        incomingCallBacks.onInvite(sip)
+        ReceiveCall(sip,incomingCallBacks);
       },
       onMessage: function (message) {
         message.accept();
@@ -2654,11 +2665,6 @@ function teardownSession(lineObj) {
   }
 }
 
-var incomingCallBacks = {};
-
-export function bindIncomingCallBacks(callBacks) {
-  incomingCallBacks = callBacks;
-}
 
 var invitation = null;
 export function rejectInvite() {
@@ -2669,7 +2675,7 @@ export function rejectInvite() {
 }
 // Inbound Calls
 // =============
-function ReceiveCall(session) {
+function ReceiveCall(session,callbacks) {
   invitation = session;
   var callerID = session.remoteIdentity.displayName;
   var did = session.remoteIdentity.uri.user;
@@ -2744,12 +2750,19 @@ function ReceiveCall(session) {
   // Session Delegates
   lineObj.SipSession.delegate = {
     onBye: function (sip) {
+      callbacks.onEnd();
+      console.log('Incoming OnBye')
       onSessionReceivedBye(lineObj, sip);
     },
     onMessage: function (sip) {
+      console.log('Incoming Callbacks')
+
       onSessionReceivedMessage(lineObj, sip);
     },
     onInvite: function (sip) {
+      
+      console.log('Incoming onInviteAgain')
+
       onSessionReinvited(lineObj, sip);
     },
     onSessionDescriptionHandler: function (sdh, provisional) {
@@ -2761,25 +2774,18 @@ function ReceiveCall(session) {
       );
     },
   };
-  // incomingInviteRequestDelegate
-  lineObj.SipSession.incomingInviteRequest.delegate = {
-    onCancel: function (sip) {
-      onInviteCancel(lineObj, sip);
-    },
-  };
+ 
 
-  // Possible Early Rejection options
-  // if (DoNotDisturbEnabled == true || DoNotDisturbPolicy == "enabled") {
-  //   if (DoNotDisturbEnabled == true && buddyObj.EnableDuringDnd == true) {
-  //     // This buddy has been allowed
-  //     //("Buddy is allowed to call while you are on DND");
-  //   } else {
-  //     //("Do Not Disturb Enabled, rejecting call.");
-  //     lineObj.SipSession.data.earlyReject = true;
-  //     RejectCall(lineObj.LineNumber, true);
-  //     return;
-  //   }
-  // }
+  //handled on fron-end
+  // lineObj.SipSession.incomingInviteRequest.delegate = {
+  //   onCancel: function (sip) {
+  //     console.log('Incoming cancel')
+
+  //     onInviteCancel(lineObj, sip);
+  //   },
+  // };
+
+ 
 
   if (CurrentCalls >= 1) {
     if (CallWaitingEnabled == false || CallWaitingEnabled == "disabled") {
@@ -2790,35 +2796,9 @@ function ReceiveCall(session) {
     }
   }
 
-  // // Create the call HTML
-  // AddLineHtml(lineObj, "inbound");
-  // //"#line-" + lineObj.LineNumber + "-msg").html(lang.incoming_call);
-  // //"#line-" + lineObj.LineNumber + "-msg").show();
-  // //"#line-" + lineObj.LineNumber + "-timer").show();
-  // if (lineObj.SipSession.data.withvideo) {
-  //   //"#line-" + lineObj.LineNumber + "-answer-video").show();
-  // } else {
-  //   //"#line-" + lineObj.LineNumber + "-answer-video").hide();
-  // }
-  // //"#line-" + lineObj.LineNumber + "-AnswerCall").show();
-
-  // Update the buddy list now so that any early rejected calls don't flash on
-  // UpdateBuddyList();
-
-  // Auto Answer options
   var autoAnswerRequested = false;
   var answerTimeout = 1000;
   if (!AutoAnswerEnabled && IntercomPolicy == "enabled") {
-    // Check headers only if policy is allow
-
-    // https://github.com/InnovateAsterisk/Browser-Phone/issues/126
-    // Alert-Info: info=alert-autoanswer
-    // Alert-Info: answer-after=0
-    // Call-info: answer-after=0; x=y
-    // Call-Info: Answer-After=0
-    // Alert-Info: ;info=alert-autoanswer
-    // Alert-Info: <sip:>;info=alert-autoanswer
-    // Alert-Info: <sip:domain>;info=alert-autoanswer
 
     var ci = session.request.headers["Call-Info"];
     if (ci !== undefined && ci.length > 0) {
@@ -2881,8 +2861,7 @@ function ReceiveCall(session) {
     false //case about auto answering
   ) {
     if (CurrentCalls == 0) {
-      // There are no other calls, so you can answer
-      //("Going to Auto Answer this call...");
+  
       window.setTimeout(function () {
         // If the call is with video, assume the auto answer is also
         // In order for this to work nicely, the recipient maut be "ready" to accept video calls
@@ -2912,40 +2891,6 @@ function ReceiveCall(session) {
     // if (CurrentCalls == 0) SelectLine(lineObj.LineNumber);
   }
 
-  // Show notification / Ring / Windows Etc
-  // ======================================
-
-  // Browser Window Notification
-  // if ("Notification" in window) {
-  //   if (Notification.permission === "granted") {
-  //     var noticeOptions = {
-  //       body: lang.incoming_call_from + " " + callerID + " <" + did + ">",
-  //       icon: getPicture(buddyObj.identity),
-  //     };
-  //     var inComingCallNotification = new Notification(
-  //       lang.incoming_call,
-  //       noticeOptions
-  //     );
-  //     inComingCallNotification.onclick = function (event) {
-  //       var lineNo = lineObj.LineNumber;
-  //       var videoInvite = lineObj.SipSession.data.withvideo;
-  //       window.setTimeout(function () {
-  //         // https://github.com/InnovateAsterisk/Browser-Phone/issues/26
-  //         if (videoInvite) {
-  //           AnswerVideoCall(lineNo);
-  //         } else {
-  //           AnswerAudioCall(lineNo);
-  //         }
-  //       }, 1000);
-
-  //       // Select Buddy
-  //       SelectLine(lineNo);
-  //       return;
-  //     };
-  //   }
-  // }
-
-  // Play Ring Tone if not on the phone
   if (EnableRingtone == true) {
     if (CurrentCalls >= 1) {
       // Play Alert

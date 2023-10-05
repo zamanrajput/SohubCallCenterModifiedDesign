@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Typography,
   Divider,
@@ -47,6 +47,7 @@ import {
   startTimer,
 } from "../../../store/home/HomeSlice";
 import { DialByLine } from "../../../utils/SipDiamond";
+import ImageViewDialog from "../../imageViewDialog";
 interface ChatContentProps {
   toggleChatSidebar: () => void;
 }
@@ -61,7 +62,7 @@ const ChatContent: React.FC<ChatContentProps> = ({
     (state) => state.chatReducer.chats[state.chatReducer.activeChatIndex]
   );
 
-  
+
   const userData = useSelector((x) => x.authReducer.user);
   var chatUser: User | null = null;
   if (chatDetails != null) {
@@ -71,7 +72,7 @@ const ChatContent: React.FC<ChatContentProps> = ({
 
   const boxRef = useRef<HTMLDivElement | null>(null);
 
-  const state = useSelector((x)=>x);
+  const state = useSelector((x) => x);
 
   useEffect(() => {
     // Scroll to the bottom of the box when items change
@@ -167,8 +168,8 @@ const ChatContent: React.FC<ChatContentProps> = ({
 
 
   function onMakeCall(): void {
-  
-    
+
+
     const opts: any = {
       type: "audio",
       num: chatUser?.sip_extension,
@@ -187,16 +188,25 @@ const ChatContent: React.FC<ChatContentProps> = ({
     dispatch(setInCallStatus('Calling...'))
   }
 
+
+  const [imageToView, setImageToView] = useState<string | null>(null);
+
   return (
     <Box>
+      <ImageViewDialog
+        label=""
+        open={imageToView != null}
+        imageUrl={imageToView ?? ''}
+        onClose={() => setImageToView(null)}
+      />
       {chatDetails ? (
         <Box>
           {/* ------------------------------------------- */}
           {/* Header Part */}
           {/* ------------------------------------------- */}
-          {state.homeReducer.inCall && (state.homeReducer.inCallUser?.id == getOpponentUser(chatDetails,state.authReducer.user?.id).id) ? (
+          {state.homeReducer.inCall && (state.homeReducer.inCallUser?.id == getOpponentUser(chatDetails, state.authReducer.user?.id).id) ? (
             <Box>
-              <InCallLayout/>
+              <InCallLayout />
               <Divider />
             </Box>
           ) : (
@@ -250,9 +260,9 @@ const ChatContent: React.FC<ChatContentProps> = ({
                 </ListItem>
                 <Stack direction={"row"}>
                   <IconButton aria-label="phone">
-                    <IconPhone onClick={()=>onMakeCall()} stroke={1.5} />
+                    <IconPhone onClick={() => onMakeCall()} stroke={1.5} />
                   </IconButton>
-               
+
                   <IconButton
                     aria-label="sidebar"
                     onClick={() => setOpen(!open)}
@@ -288,7 +298,10 @@ const ChatContent: React.FC<ChatContentProps> = ({
                     return (
                       <Box key={message.id + message.created_at}>
                         {message.from_id.toString() ==
-                        chatUser?.id.toString() ? (
+                          chatUser?.id.toString() ? (
+
+
+
                           <Box display="flex">
                             <ListItemAvatar>
                               <Avatar
@@ -323,7 +336,14 @@ const ChatContent: React.FC<ChatContentProps> = ({
                                   maxWidth: "320px",
                                 }}
                               >
-                                {message.message}
+                                {message.type == 'image' ? <Avatar
+                                  onClick={() => setImageToView(message.attachment_url)}
+                                  src={message.attachment_url}
+                                  alt="media"
+                                  variant="rounded"
+                                  sx={{ width: "180px", height: "180px" }}
+                                /> : message.message}
+
                               </Box>
                               {/* {getFileTypeFromUrl(chat.attachment_url) === "text" ? (
                                 <Box
@@ -391,7 +411,16 @@ const ChatContent: React.FC<ChatContentProps> = ({
                                   maxWidth: "320px",
                                 }}
                               >
-                                {message.message}
+
+
+                                {message.type == 'image' ? <Avatar
+                                  onClick={() => setImageToView(message.attachment_url)}
+                                  src={message.attachment_url}
+                                  alt="media"
+                                  variant="rounded"
+                                  sx={{ width: "180px", height: "180px" }}
+                                /> : message.message}
+
                               </Box>
                               {/* {chat.type === "text" ? (
                                 <Box

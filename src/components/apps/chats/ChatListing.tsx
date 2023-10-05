@@ -54,19 +54,10 @@ import {
 } from "../../../store/home/HomeSlice";
 import { getCreds, loadUser } from "../../../store/auth/AuthSlice";
 import { Chat } from "../../../types/response_schemas";
-import { getFileTypeFromUrl, getOpponentUser } from "../../../utils/utils";
+import { getChatWithExt, getFileTypeFromUrl, getOpponentUser } from "../../../utils/utils";
 import { getUserFromExt } from "../../../utils/WebSocket";
 import User from "../../../types/auth/User";
-
-
-
-
-
-
-
-
-
-
+import { viewFileBaseUrl } from "../../../utils/API_LINKS";
 
 
 const ChatListing = () => {
@@ -99,13 +90,12 @@ const ChatListing = () => {
   const thisUser = useSelector((c)=>c.authReducer.user);
 
   const getDetails = (conversation: Chat) => {
-    let displayText = "";
+    let displayText = "started new chat";
 
     const lastMessage = conversation.messages[conversation.messages.length - 1];
     if (lastMessage) {
       const sender = lastMessage.from_id === thisUser?.id ? "You: " : "";
-      const message =
-        getFileTypeFromUrl(lastMessage.attachment_url) === "jpg" ? "Sent a photo" : lastMessage.message;
+      const message = lastMessage.type=== "image" ? "Sent a photo" : lastMessage.message;
       displayText = `${sender}${message}`;
     }
 
@@ -214,6 +204,12 @@ const ChatListing = () => {
   function onCallButtonClick(number: string) {
     var targetUser:User|null; 
      getUserFromExt(number,(found)=>{
+
+      const chat =  getChatWithExt(chats,userData,found.sip_extension);
+      if(chat!=null){
+
+      }
+
       targetUser = found;
 
       const opts: any = {

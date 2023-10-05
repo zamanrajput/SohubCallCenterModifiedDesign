@@ -28,14 +28,25 @@ export function getOpponentUser(chat: Chat, thisUser: string | null | undefined)
 }
 
 
-export function getChatWithExt(chats: Chat[], thisUser: User, ext: string): Chat | null {
+export function getChatWithExt(chats: Chat[], thisUser: User | null, ext: string | null | undefined): Chat | null {
     for (var i = 0; i < chats.length; i++) {
         const chat = chats[i];
-        if (getOpponentUser(chat, thisUser.id).sip_extension == ext) {
+        console.log('comparison:Id=>dynamic User Ext :'+getOpponentUser(chat,thisUser?.id).sip_extension+" Passed Ext:"+ext)
+        if (getOpponentUser(chat, thisUser?.id).sip_extension == ext) {
             return chat;
         }
     };
     return null;
+}
+
+export function getChatIndex(chats: Chat[], thisUser: User | null, id: string): number {
+    for (var i = 0; i < chats.length; i++) {
+        const chat = chats[i];
+        if (chat.id === id) {
+            return i;
+        }
+    };
+    return -1;
 }
 export function secondsToHHMMSS(seconds: number): string {
     const hours = Math.floor(seconds / 3600);

@@ -101,10 +101,10 @@ export default function Modern() {
 
 
 
-  const data = useSelector((state) => state.homeReducer);
-  const creds = useSelector((state) => state.authReducer.user);
+  const data = useSelector((state:any) => state.homeReducer);
+  const creds = useSelector((state:any) => state.authReducer.user);
 
-  const id = useSelector((x) => x.authReducer.user?.id);
+  const id = useSelector((x:any) => x.authReducer.user?.id);
 
   //("XYZ", 'id:' + id);
   if (id != null) {
@@ -124,7 +124,7 @@ export default function Modern() {
 
 
 
-  const user = useSelector((s) => s.authReducer.user);
+  const user = useSelector((s:any) => s.authReducer.user);
 
   const [isDone, setIsDone] = useState(false);
 

@@ -1,5 +1,4 @@
 
-import Lottie, { Options } from 'react-lottie';
 
 type LottieAnimationType = {
     animationData: any,
@@ -7,7 +6,7 @@ type LottieAnimationType = {
     height: number
 }
 export default function LottieAnimationView(props: LottieAnimationType) {
-    const defaultOptions: Options = {
+    const defaultOptions = {
 
         loop: true,
         autoplay: true,
@@ -20,7 +19,8 @@ export default function LottieAnimationView(props: LottieAnimationType) {
 
     return (
         <div >
-            <Lottie
+            <LottieAnimationView
+            
                 style={{ background: '#RRGGBBAA', borderRadius: '10px'}}
                 isClickToPauseDisabled={true}
 

@@ -1,3 +1,4 @@
+import Lottie from "lottie-react";
 
 
 type LottieAnimationType = {
@@ -19,12 +20,10 @@ export default function LottieAnimationView(props: LottieAnimationType) {
 
     return (
         <div >
-            <LottieAnimationView
-            
-                style={{ background: '#RRGGBBAA', borderRadius: '10px'}}
-                isClickToPauseDisabled={true}
-
-                options={defaultOptions}
+            <Lottie
+    
+                loop={true}
+                animationData={props.animationData}
                 height={props.height}
                 width={props.width}
             />

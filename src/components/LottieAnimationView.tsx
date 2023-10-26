@@ -1,5 +1,4 @@
-import Lottie from "lottie-react";
-
+import Lottie from "react-lottie";
 
 type LottieAnimationType = {
     animationData: any,
@@ -20,10 +19,11 @@ export default function LottieAnimationView(props: LottieAnimationType) {
 
     return (
         <div >
-            <Lottie
+            <Lottie 
+            
     
-                loop={true}
-                animationData={props.animationData}
+                options={defaultOptions}
+            
                 height={props.height}
                 width={props.width}
             />

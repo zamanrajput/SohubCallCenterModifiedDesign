@@ -7,10 +7,8 @@ import { GetChatsRequest, LoginRequest, NewChatRequest, NewMessageRequest, UserF
 
 
 function getSocket(): WebSocket {
-
     const socket = new WebSocket(socketBaseUrl);
     return socket;
-
 }
 
 

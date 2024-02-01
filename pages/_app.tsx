@@ -26,8 +26,7 @@ import "./forms/form-quill/Quill.css";
 import "./apps/calendar/Calendar.css";
 import "../src/components/landingpage/testimonial/testimonial.css";
 import "../src/components/landingpage/demo-slider/demo-slider.css";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+
 import "../src/components/pages/home/DialPad/DialPad.css";
 import "../src/globals.css";
 
